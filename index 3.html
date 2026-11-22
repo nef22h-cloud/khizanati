@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>خزانتي</title>
+<meta name="theme-color" content="#f3f4f7" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#0e0f12" media="(prefers-color-scheme: dark)">
+
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="خزانتي"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600&display=swap">
+<style>
+:root{--bg:#f1f3ef;--card:#fafbf8;--soft:#e2ebe7;--tx:#232d29;--mut:#5d6963;--ac:#3f6b66;--ac2:var(--ac);--acx:#fff;--bd:#dfe4de;--rd:#a8403a;--sh:none;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#131917;--card:#1b2320;--soft:#26342f;--tx:#e7eee9;--mut:#9aa8a1;--ac:#86bdb4;--acx:#0e1614;--bd:#2a3531;--rd:#e58b82;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#131917;--card:#1b2320;--soft:#26342f;--tx:#e7eee9;--mut:#9aa8a1;--ac:#86bdb4;--acx:#0e1614;--bd:#2a3531;--rd:#e58b82;color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:"Readex Pro","Tajawal","Segoe UI",Tahoma,"Noto Sans Arabic",system-ui,sans-serif;font-weight:400;line-height:1.7;padding-bottom:110px;-webkit-font-smoothing:antialiased}
+button{cursor:pointer;font-family:inherit;transition:transform .12s,background .2s,border-color .2s}button:active{transform:scale(.98)}
+button:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+input[type=checkbox]{accent-color:var(--ac);width:18px;height:18px;margin:0}input[type=range]{accent-color:var(--ac)}
+main{max-width:560px;margin:0 auto;padding:20px 18px}
+h1{font-size:24px;font-weight:500;margin:10px 0 6px}
+h3{margin:30px 0 10px;font-size:16px;font-weight:500}
+.sub{color:var(--mut);font-size:14px;margin-bottom:16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.chip{border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:8px 15px;min-height:40px;border-radius:99px;font:inherit;font-size:14px}
+.chip.on{background:var(--soft);color:var(--ac);border-color:var(--ac);font-weight:500}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:22px;padding:18px;margin:16px 0}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.piece{position:relative;border-radius:16px;overflow:hidden;background:var(--card);border:2px solid transparent;transition:border-color .15s}
+.piece.sel{border-color:var(--ac)}
+.piece img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+.piece span{position:absolute;bottom:8px;right:8px;background:rgba(25,32,29,.62);color:#fff;font-size:12px;padding:3px 10px;border-radius:99px;max-width:calc(100% - 16px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ab{position:absolute;top:8px;left:8px;display:flex;gap:6px;z-index:2}.ab button{width:34px;height:34px;border:0;border-radius:50%;background:rgba(25,32,29,.55);font-size:15px;padding:0}
+#dlg{position:fixed;inset:0;background:rgba(20,28,25,.45);display:flex;align-items:flex-end;justify-content:center;z-index:50}#dlg[hidden],#toast[hidden]{display:none}
+.dbox{background:var(--card);padding:24px 20px calc(20px + env(safe-area-inset-bottom,0px));border-radius:26px 26px 0 0;width:100%;max-width:560px;max-height:90vh;overflow:auto;text-align:center;font-size:16px;font-weight:500;animation:up .22s ease-out}
+@keyframes up{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+#toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:11px 18px;border-radius:99px;font-size:14px;z-index:60;max-width:90vw;text-align:center}
+.btn{border:0;border-radius:16px;min-height:50px;padding:12px 16px;font:inherit;font-size:16px;font-weight:500;background:var(--ac);color:var(--acx);width:100%;margin-top:10px}
+.btn.alt{background:var(--soft);color:var(--tx)}
+.btn.red{background:transparent;color:var(--rd);border:1px solid color-mix(in srgb,var(--rd) 45%,transparent)}
+.row2{display:flex;gap:10px}.row2 .btn{flex:1}
+.score{font-size:15px;margin:14px 0 4px}.score b{color:var(--ac);font-size:22px;font-weight:600}
+.bar{height:6px;border-radius:99px;background:var(--bd);overflow:hidden;margin:8px 0 10px}.bar i{display:block;height:100%;border-radius:99px;background:var(--ac)}
+.note{color:var(--mut);font-size:13.5px;margin-top:6px;line-height:1.7}
+.ai{margin-top:12px;padding:14px 16px;border-radius:16px;background:var(--soft);font-size:14px;line-height:1.9;white-space:pre-wrap}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--bd);padding:6px 6px env(safe-area-inset-bottom,0px);z-index:20}
+nav button{flex:1;border:0;background:none;color:var(--mut);padding:2px 2px 6px;font:inherit;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:3px;min-height:56px}
+nav button i{display:grid;place-items:center;width:56px;height:30px;border-radius:15px;transition:background .2s}
+nav button svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+nav button.on{color:var(--ac);font-weight:500}nav button.on i{background:var(--soft)}
+label{display:block;font-size:13.5px;font-weight:400;margin:16px 0 6px;color:var(--mut)}
+select,.inp{width:100%;min-height:46px;padding:10px 14px;border-radius:14px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font:inherit;font-size:15px}
+.inp{margin-bottom:8px}
+.pick{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:1.5px dashed var(--bd);border-radius:20px;min-height:130px;color:var(--mut);overflow:hidden;cursor:pointer;margin-top:10px;text-align:center;padding:12px;background:var(--card)}
+.pick img{width:100%;max-height:280px;object-fit:cover;border-radius:14px}
+.empty{text-align:center;color:var(--mut);padding:30px 12px;line-height:1.9}
+.strip{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 8px}
+.day{flex:0 0 76px;text-align:center;font-size:12px;color:var(--mut)}
+.day .t{display:grid;grid-template-columns:1fr 1fr;gap:2px;border-radius:14px;overflow:hidden;background:var(--bd);aspect-ratio:1;margin-bottom:5px}
+.day img{width:100%;height:100%;object-fit:cover;display:block}
+.thumbs{display:flex;gap:6px;margin:8px 0;flex-wrap:wrap}.thumbs img{width:52px;height:52px;object-fit:cover;border-radius:12px;border:1px solid var(--bd)}
+.wk{display:flex;align-items:center;gap:8px;padding:12px 0;border-bottom:1px solid var(--bd)}.wk:last-child{border:0}
+.wk b{width:62px;font-size:14px;font-weight:500}.wk select{width:96px;min-height:40px;padding:6px 8px;font-size:13px}
+.busy{color:var(--ac);font-size:14px;margin:8px 0}
+.nudge{background:var(--soft);border-color:transparent}.nm{font-size:17px;font-weight:500;line-height:1.8}
+.board{position:relative;aspect-ratio:1/1.35;background:#f7f6f2;border-radius:18px;overflow:hidden;max-width:340px;margin:10px auto}.board img{position:absolute;object-fit:contain;mix-blend-mode:multiply}
+details.fold{padding:0}
+details.fold>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:16px 18px;font-weight:500;font-size:15px;min-height:54px}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary::after{content:"";width:8px;height:8px;border-inline-end:1.6px solid var(--mut);border-bottom:1.6px solid var(--mut);transform:rotate(45deg);margin-top:-3px;transition:transform .2s}
+details.fold[open]>summary::after{transform:rotate(-135deg);margin-top:3px}
+details.fold>*:not(summary){margin-inline:18px}
+details.fold>*:last-child{margin-bottom:18px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+#app.go>*{animation:up .32s cubic-bezier(.2,.7,.3,1) both}#app.go>*:nth-child(2){animation-delay:.04s}#app.go>*:nth-child(3){animation-delay:.08s}#app.go>*:nth-child(n+4){animation-delay:.12s}
+.btn,.chip,nav button{transition:transform .14s,background-color .2s,opacity .2s}.btn:active,.chip:active,nav button:active{transform:scale(.96)}
+nav button i{transition:transform .22s}nav button.on i{transform:translateY(-1px) scale(1.08)}
+.card{transition:border-color .2s,transform .2s}details.fold[open]>summary{margin-bottom:6px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.piece img,.thumbs img,.day img,.board img,.pick img{animation:fi .45s ease both}.piece img{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+@keyframes fi{from{opacity:0;filter:blur(6px)}to{opacity:1;filter:none}}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .card{box-shadow:0 1px 2px rgba(20,40,30,.05),0 10px 26px -14px rgba(20,40,30,.18)}}
+.piece{transition:border-color .15s,transform .15s}.piece:active{transform:scale(.97)}
+#app.go .grid>.piece{animation:up .38s cubic-bezier(.2,.7,.3,1) both}#app.go .grid>.piece:nth-child(2){animation-delay:.04s}#app.go .grid>.piece:nth-child(3){animation-delay:.08s}#app.go .grid>.piece:nth-child(4){animation-delay:.12s}#app.go .grid>.piece:nth-child(n+5){animation-delay:.16s}
+nav{backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:color-mix(in srgb,var(--card) 86%,transparent)}
+#dlg{backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);animation:fd .2s ease-out}@keyframes fd{from{opacity:0}}
+#toast{animation:tin .28s cubic-bezier(.2,.7,.3,1)}@keyframes tin{from{opacity:0;transform:translate(-50%,14px) scale(.96)}to{opacity:1;transform:translate(-50%,0)}}
+.bar i{transform-origin:right;animation:gr .8s cubic-bezier(.2,.7,.3,1)}@keyframes gr{from{transform:scaleX(0)}}
+h1{font-weight:600;letter-spacing:-.2px}.btn{box-shadow:0 6px 16px -10px var(--ac)}.btn.alt,.btn.red{box-shadow:none}
+.board{cursor:zoom-in}
+#lb{position:fixed;inset:0;z-index:80;background:rgba(10,14,12,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:grid;place-items:center;animation:fd .22s ease-out}#lb[hidden]{display:none}
+#lb button{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:16px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.16);color:#fff;font-size:18px}
+#lbc{max-width:94vw;max-height:84vh;animation:zin .3s cubic-bezier(.2,.7,.3,1)}#lbc>img{max-width:94vw;max-height:84vh;border-radius:20px;display:block;background:#f7f6f2;object-fit:contain}
+@keyframes zin{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:none}}
+
+/* ===== modern theme: ink + lavender, floating nav, media-first ===== */
+:root{--bg:#f3f4f7;--card:#fff;--soft:#ecebff;--tx:#14161b;--mut:#737888;--ac:#14161b;--acx:#fff;--bd:#e6e7ec;--rd:#d6453b;--tile:#eceef3}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e0f12;--card:#17181d;--soft:#25264a;--tx:#eef0f4;--mut:#9a9fae;--ac:#f1f2f5;--acx:#14161b;--bd:#25262c;--rd:#ff8a80;--tile:#1f2026}}
+:root[data-theme="dark"]{--bg:#0e0f12;--card:#17181d;--soft:#25264a;--tx:#eef0f4;--mut:#9a9fae;--ac:#f1f2f5;--acx:#14161b;--bd:#25262c;--rd:#ff8a80;--tile:#1f2026}
+body{padding-bottom:130px}
+main{padding:22px 18px}
+h1{font-size:30px;font-weight:600;letter-spacing:-.01em;line-height:1.35;margin:14px 0 6px}
+h3{font-size:17px;font-weight:600;margin:32px 0 12px}
+.sub{font-size:14.5px}
+.card{border:0;border-radius:28px;padding:20px;box-shadow:0 1px 1px rgba(20,22,27,.03),0 18px 40px -24px rgba(20,22,27,.25)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .card{box-shadow:none}}
+:root[data-theme="dark"] .card{box-shadow:none}
+.chip{border:0;background:var(--card);min-height:42px;padding:9px 18px;box-shadow:0 1px 2px rgba(20,22,27,.07)}
+.chip.on{background:var(--ac);color:var(--acx);box-shadow:none;font-weight:500}
+.btn{border-radius:99px;min-height:54px;font-weight:600}
+.btn.alt{background:var(--soft);color:var(--tx)}
+.btn.red{border-radius:99px}
+.piece{border-radius:24px;background:var(--tile)}
+.piece span{background:rgba(255,255,255,.85);color:#14161b;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font-weight:500}
+.ab button{background:rgba(255,255,255,.88);color:#14161b;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.grid{gap:14px}
+.ai,.nudge{background:var(--soft);border-radius:22px}
+.score b{font-size:26px}
+.pick{border-radius:26px;background:var(--tile);border:0;min-height:150px}
+select,.inp{border-radius:16px;min-height:50px}
+nav{left:14px;right:14px;bottom:calc(12px + env(safe-area-inset-bottom,0px));max-width:532px;margin:0 auto;border:0;border-radius:34px;padding:7px;background:color-mix(in srgb,var(--card) 84%,transparent);-webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5);box-shadow:0 12px 40px -12px rgba(20,22,27,.38)}
+nav button{min-height:58px}
+nav button.on{color:var(--tx)}
+nav button.on i{background:var(--ac);color:var(--acx);transform:none}
+#toast{bottom:112px}
+.dbox{border-radius:34px 34px 0 0}
+details.fold>summary{font-weight:600}
+.board{border-radius:26px}
+
+/* ===== futuristic scanner ===== */
+.scanbox{position:relative;border-radius:28px;overflow:hidden;background:#fff;margin-top:10px;box-shadow:0 18px 40px -24px rgba(20,22,27,.35)}
+.scanbox img{width:100%;max-height:340px;object-fit:contain;display:block;background:#fff}
+.scanbox.on::before{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(rgba(139,123,255,.16) 1px,transparent 1px) 0 0/100% 14px,linear-gradient(90deg,rgba(139,123,255,.16) 1px,transparent 1px) 0 0/14px 100%;animation:gridp 1.6s ease-in-out infinite}
+.beam{position:absolute;left:0;right:0;height:90px;top:-45px;z-index:3;pointer-events:none;background:linear-gradient(transparent,rgba(139,123,255,.32) 50%,transparent);animation:sweep 2.1s ease-in-out infinite alternate}
+.beam::after{content:"";position:absolute;left:0;right:0;top:43px;height:3px;background:linear-gradient(90deg,transparent,#8b7bff 20%,#fff 50%,#8b7bff 80%,transparent);box-shadow:0 0 14px 4px rgba(139,123,255,.85)}
+.cn{position:absolute;width:28px;height:28px;border:3px solid #8b7bff;z-index:4;animation:cnp 1.2s ease-in-out infinite}
+.cn.a{top:12px;right:12px;border-left:0;border-bottom:0;border-radius:0 10px 0 0}.cn.b{top:12px;left:12px;border-right:0;border-bottom:0;border-radius:10px 0 0 0}
+.cn.c{bottom:12px;right:12px;border-left:0;border-top:0;border-radius:0 0 10px 0}.cn.d{bottom:12px;left:12px;border-right:0;border-top:0;border-radius:0 0 0 10px}
+.scanlbl{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);z-index:5;background:rgba(20,22,27,.8);color:#fff;font-size:13px;padding:7px 16px;border-radius:99px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);white-space:nowrap}
+.found{margin-top:12px;padding:14px 16px;border-radius:22px;background:var(--soft)}.found .ft{font-size:14px;font-weight:600;margin-bottom:10px}
+.fr{display:flex;flex-wrap:wrap;gap:8px}
+.fb{display:inline-flex;align-items:center;gap:6px;background:var(--card);padding:7px 14px;border-radius:99px;font-size:14px;animation:pop .45s cubic-bezier(.2,.8,.3,1) both;animation-delay:var(--d,0s)}
+.dot{width:14px;height:14px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2)}
+@keyframes sweep{from{top:-45px}to{top:calc(100% - 45px)}}
+@keyframes gridp{0%,100%{opacity:.45}50%{opacity:1}}
+@keyframes cnp{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.1)}}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.88)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<main id="app"></main><div id="dlg" hidden></div><div id="toast" hidden></div>
+<nav><button data-t="today" class="on"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3 3 6l2.5 4L8 9v11h8V9l2.5 1L21 6l-5-3c-.5 1.5-2 2.5-4 2.5S8.5 4.5 8 3z"/></svg></i>اليوم</button><button data-t="week"><i><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg></i>الأسبوع</button><button data-t="style"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.7 4.7 1.8-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M18.5 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg></i>تنسيق</button><button data-t="closet"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7.5a2.2 2.2 0 1 0-2.2-2.2"/><path d="M12 7.5v2L3.5 16a1.6 1.6 0 0 0 1 2.9h15a1.6 1.6 0 0 0 1-2.9L12 9.5"/></svg></i>خزانتي</button><button data-t="add"><i><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg></i>قطعة</button></nav>
+<script>
+const CATS={top:"تيشيرتات وقمصان",bottom:"بناطيل",thobe:"أثواب",jacket:"جاكيتات",shoes:"أحذية",acc:"إكسسوارات"};
+const SUBS={top:["تيشيرت","تيشيرت رياضي","بولو","قميص","هودي","سويتر","فنيلة / تحتية"],bottom:["جينز","شينو","بنطلون قماش","كارقو","جوجر / رياضي","شورت","بنطلون رسمي"],thobe:["ثوب صيفي","ثوب شتوي","ثوب رسمي","ثوب كاجوال"],jacket:["جاكيت جلد","جاكيت جينز","بومبر","معطف","بشت","جاكيت رياضي","بليزر"],shoes:["سنيكرز","رياضي","رسمي / كلاسيك","موكاسين","بوت","صندل / شبشب","نعال / مداس"],acc:["ساعة","نظارة","شماغ / غترة","طاقية / كاب","سلسلة","خاتم","سوار","حزام","محفظة","شنطة","كرفتة / ببيون","وشاح","قفازات","عطر / أخرى"]};
+const OCC=["كوفي","مطعم","دوام","رسمي","رياضة","طلعة / سفر","عادي"];
+const SEAS={all:"كل الأوقات",hot:"صيفي (خفيف)",cold:"شتوي (ثقيل)"};
+const seasonRule=sub=>HOT_NO.includes(sub)?"cold":COLD_NO.includes(sub)?"hot":"all";
+const WEA={"حار":"☀️","معتدل":"🌤️","بارد":"❄️"};
+const COLORS=["أسود","أبيض","رمادي","بيج","كحلي","بني","أخضر","زيتي","أحمر","أزرق","أصفر","وردي","فضي","ذهبي"];
+const NEU=["أسود","أبيض","رمادي","بيج","كحلي","بني","فضي","ذهبي"];
+let items=[],log={},outfits=[],tab="today",occ="كوفي",weather="معتدل",cur=null,man=null,plan=null,busy=null,editId=null,cf="all";
+let draft=newDraft(),events=[],wx=null,wxT=0,fl={color:"",season:"",occ:""},fo="all",stEdit=null,cr={},autoClean=true,rawImg=null,cleaned=null,selMode=false,msel=new Set();try{autoClean=localStorage.ac!="0"}catch(e){}
+function newDraft(){return{colors:["أسود"],img:null,cat:"top",sub:"",color:"أسود",occ:["عادي"],season:"all"}}
+const dstr=d=>{const x=new Date(d);return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0")};
+const today=()=>dstr(Date.now());
+const $i=id=>items.find(i=>i.id==id);
+let dis=new Set(),thr=3;try{dis=new Set(JSON.parse(localStorage.dis||"[]"));thr=+localStorage.thr||3}catch(e){}
+const dk=(a,b)=>a<b?a+"-"+b:b+"-"+a,saveDis=()=>{try{localStorage.dis=JSON.stringify([...dis])}catch(e){}};
+/* storage */
+let db=null;
+function openDB(){return new Promise(r=>{try{const q=indexedDB.open("wardrobe",3);q.onupgradeneeded=()=>{const d=q.result;if(!d.objectStoreNames.contains("items"))d.createObjectStore("items",{keyPath:"id"});if(!d.objectStoreNames.contains("log"))d.createObjectStore("log",{keyPath:"d"});if(!d.objectStoreNames.contains("outfits"))d.createObjectStore("outfits",{keyPath:"id"});if(!d.objectStoreNames.contains("events"))d.createObjectStore("events",{keyPath:"id"})};q.onsuccess=()=>{db=q.result;try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}r()};q.onerror=()=>r()}catch(e){r()}})}
+function all(s){return new Promise(r=>{if(!db)return r([]);try{const q=db.transaction(s).objectStore(s).getAll();q.onsuccess=()=>r(q.result);q.onerror=()=>r([])}catch(e){r([])}})}
+function put(s,v){try{if(db)db.transaction(s,"readwrite").objectStore(s).put(v)}catch(e){}}
+function del(s,k){try{if(db)db.transaction(s,"readwrite").objectStore(s).delete(k)}catch(e){}}
+/* images + AI */
+function shrink(file){return new Promise(res=>{const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const m=720,s=Math.min(1,m/Math.max(im.width,im.height));const c=document.createElement("canvas");c.width=im.width*s;c.height=im.height*s;c.getContext("2d").drawImage(im,0,0,c.width,c.height);res(c.toDataURL("image/jpeg",.78))};im.src=fr.result};fr.readAsDataURL(file)})}
+function blobOf(d){const b=atob(d.split(",")[1]);const u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return new Blob([u],{type:"image/jpeg"})}
+let sample=null;
+
+async function aiTag1(img){if(!sample)return null;
+ try{const r=await sample.json('This is a photo of ONE clothing item. Return ONLY JSON: {"cat": one of ["top","bottom","thobe","jacket","shoes","acc"] (acc = accessory such as watch, glasses, cap, belt, bag, chain), "sub": the best matching type for that cat chosen from this map '+JSON.stringify(SUBS)+', "colors": array of ALL clearly visible colors of the item (1 to 4, the dominant color first, include prints, stripes, logos and trims if clearly visible), each chosen from '+JSON.stringify(COLORS)+', "occ": array chosen from '+JSON.stringify(OCC)+' where it suits (casual items: عادي and كوفي; smart items: مطعم, دوام, رسمي; sportswear: رياضة; thobes suit most daily occasions), "season": "hot" for light, thin, breathable summer items (shorts, sleeveless, thin cotton or linen, sandals, light thobe), "cold" for thick, warm winter items (wool, fleece, hoodies, sweaters, heavy long sleeves, coats, jackets, boots, scarves, gloves, winter thobe), and "all" ONLY if it truly suits every season (for example plain jeans, sneakers, belts, watches). Do not answer "all" by default}',{images:[blobOf(img)],modelTier:"quick"});
+  const o={};if(CATS[r.cat])o.cat=r.cat;{const m=matchSub(o.cat||r.cat,r.sub);if(m){o.cat=m.cat;o.sub=m.sub}else o.sub=""}{const cl=(Array.isArray(r.colors)?r.colors:[r.color]).filter((c,i,a)=>COLORS.includes(c)&&a.indexOf(c)==i).slice(0,4);if(cl.length){o.colors=cl;o.color=cl[0]}}if(Array.isArray(r.occ)){const k=r.occ.filter(x=>OCC.includes(x));if(k.length)o.occ=k}if(SEAS[r.season])o.season=r.season;if((o.season||"all")=="all"){const sr=seasonRule(o.sub);if(sr!="all")o.season=sr}return o}catch(e){return null}}
+const SYN={"t-shirt":"تيشيرت","tshirt":"تيشيرت","tee":"تيشيرت","shirt":"قميص","dress shirt":"قميص","polo":"بولو","hoodie":"هودي","sweater":"سويتر","sweatshirt":"سويتر","jeans":"جينز","chino":"شينو","chinos":"شينو","cargo":"كارقو","shorts":"شورت","joggers":"جوجر / رياضي","sweatpants":"جوجر / رياضي","trousers":"بنطلون قماش","slacks":"بنطلون رسمي","sneakers":"سنيكرز","trainers":"رياضي","boots":"بوت","sandals":"صندل / شبشب","slippers":"صندل / شبشب","loafers":"موكاسين","dress shoes":"رسمي / كلاسيك","watch":"ساعة","glasses":"نظارة","sunglasses":"نظارة","cap":"طاقية / كاب","hat":"طاقية / كاب","belt":"حزام","bag":"شنطة","wallet":"محفظة","scarf":"وشاح","gloves":"قفازات","coat":"معطف","blazer":"بليزر","bomber":"بومبر","thobe":"ثوب كاجوال","bisht":"بشت","shemagh":"شماغ / غترة","ghutra":"شماغ / غترة","necklace":"سلسلة","chain":"سلسلة","ring":"خاتم","bracelet":"سوار","tie":"كرفتة / ببيون"};
+function matchSub(cat,sub){if(!sub)return null;const n=x=>String(x).trim().toLowerCase().replace(/[\u064B-\u0652]/g,"");const q=n(sub),order=[cat,...Object.keys(SUBS).filter(c=>c!=cat)].filter(c=>SUBS[c]);
+ for(const c of order){const f=SUBS[c].find(x=>n(x)==q);if(f)return{cat:c,sub:f}}
+ if(SYN[q])for(const c of order)if(SUBS[c].includes(SYN[q]))return{cat:c,sub:SYN[q]};
+ if(q.length>2)for(const c of order){const f=SUBS[c].find(x=>{const y=n(x);return y.length>2&&(q.includes(y)||y.includes(q))});if(f)return{cat:c,sub:f}}
+ return null}
+async function aiTag(img){if(!sample)return null;let t=await aiTag1(img);if(!t)t=await aiTag1(img);
+ if(t&&!t.sub){try{const r=await sample.json('What exactly is this clothing item or accessory? Return ONLY JSON {"cat": one of '+JSON.stringify(Object.keys(CATS))+', "sub": one string copied exactly from this map for that cat: '+JSON.stringify(SUBS)+'}. You MUST choose the closest option even if unsure.',{images:[blobOf(img)],modelTier:"quick"});const m=matchSub(r.cat,r.sub);if(m){t.cat=m.cat;t.sub=m.sub}else if(CATS[r.cat])t.cat=r.cat}catch(e){}}
+ if(t&&t.sub&&(t.season||"all")=="all"){const sr=seasonRule(t.sub);if(sr!="all")t.season=sr}
+ return t}
+/* outfit logic */
+function score(parts){const cs=parts.flatMap(p=>p.colors||[p.color]);const non=[...new Set(cs.filter(c=>!NEU.includes(c)))];let s=82;if(non.length>=3)s-=28;else if(non.length==2)s-=14;
+ const top=parts.find(p=>p.cat=="top"),bot=parts.find(p=>p.cat=="bottom");
+ if(top&&bot&&top.color==bot.color)s-=NEU.includes(top.color)?4:12;
+ if(non.length==1)s+=8;if(non.length==0)s+=5;
+ const sh=parts.find(p=>p.cat=="shoes");if(sh&&NEU.includes(sh.color))s+=4;
+ const pc=["top","bottom","shoes","jacket","thobe"].map(c=>parts.find(p=>p.cat==c)).filter(Boolean).map(p=>p.color),has=(a,b)=>pc.includes(a)&&pc.includes(b);
+ if(has("أسود","بني"))s-=10;if(has("أسود","كحلي"))s-=6;if(has("بني","رمادي"))s-=4;
+ for(const[a,b]of [["أحمر","أخضر"],["أحمر","وردي"],["أحمر","زيتي"],["أصفر","وردي"],["أزرق","أخضر"],["أصفر","أخضر"],["أحمر","أصفر"]])if(has(a,b))s-=16;
+ const lv=parts.filter(p=>["top","bottom","shoes","jacket"].includes(p.cat)&&LV[p.sub]!=null).map(p=>LV[p.sub]);if(lv.length>1&&Math.max(...lv)-Math.min(...lv)>=2)s-=12;
+ return Math.max(40,Math.min(98,s))}
+const rec=it=>Math.min(it.last?(Date.now()-it.last)/864e5:30,14);
+const HOT_NO=["سويتر","هودي","معطف","بشت","جاكيت جلد","بوت","قفازات","وشاح","ثوب شتوي"],COLD_NO=["شورت","صندل / شبشب","ثوب صيفي"];
+const LV={"تيشيرت رياضي":0,"جوجر / رياضي":0,"رياضي":0,"جاكيت رياضي":0,"صندل / شبشب":0,"شورت":1,"نعال / مداس":1,"تيشيرت":1,"هودي":1,"فنيلة / تحتية":1,"جينز":1,"كارقو":1,"سنيكرز":1,"بومبر":1,"جاكيت جينز":1,"موكاسين":2,"بوت":2,"جاكيت جلد":2,"بولو":2,"سويتر":2,"قميص":2,"شينو":2,"بنطلون قماش":2,"معطف":2,"بنطلون رسمي":3,"رسمي / كلاسيك":3,"بليزر":3,"بشت":3,"ثوب رسمي":3,"ثوب شتوي":2,"ثوب صيفي":1.5,"ثوب كاجوال":1};
+const TGT={"رسمي":3,"دوام":2.5,"مطعم":2,"كوفي":1.5,"عادي":1,"طلعة / سفر":1,"رياضة":0};
+const SPORT_OK={top:["تيشيرت رياضي","تيشيرت","فنيلة / تحتية","هودي"],bottom:["جوجر / رياضي","شورت"],shoes:["رياضي","سنيكرز"],jacket:["جاكيت رياضي"]};
+const BAD={
+ "رسمي":["تيشيرت","تيشيرت رياضي","هودي","فنيلة / تحتية","جينز","كارقو","جوجر / رياضي","شورت","سنيكرز","رياضي","صندل / شبشب","نعال / مداس","جاكيت رياضي","بومبر","جاكيت جينز","ثوب كاجوال"],
+ "دوام":["تيشيرت رياضي","هودي","جوجر / رياضي","شورت","كارقو","رياضي","صندل / شبشب","نعال / مداس","جاكيت رياضي","بومبر","ثوب كاجوال"],
+ "مطعم":["تيشيرت رياضي","جوجر / رياضي","شورت","رياضي","صندل / شبشب","نعال / مداس","جاكيت رياضي","فنيلة / تحتية","كرفتة / ببيون"],
+ "كوفي":["تيشيرت رياضي","جوجر / رياضي","رياضي","نعال / مداس","جاكيت رياضي","فنيلة / تحتية","بشت","كرفتة / ببيون"],
+ "طلعة / سفر":["بنطلون رسمي","رسمي / كلاسيك","بليزر","ثوب رسمي","بشت","كرفتة / ببيون"],
+ "عادي":["بشت","كرفتة / ببيون","بليزر"]};
+/* هل القطعة مناسبة فعلاً لهالمناسبة (حسب نوعها التفصيلي) */
+function fits(i,o){const s=i.sub||"";if(!s)return true;
+ if(o=="رياضة"){if(i.cat=="thobe")return false;if(i.cat=="acc")return!["كرفتة / ببيون","شماغ / غترة","بشت"].includes(s);return(SPORT_OK[i.cat]||[]).includes(s)}
+ return!(BAD[o]||[]).includes(s)}
+const wOK=i=>weather=="حار"?(i.season!="cold"&&!HOT_NO.includes(i.sub)):weather=="بارد"?(i.season!="hot"&&!COLD_NO.includes(i.sub)):true;
+function gen(o=occ,avoid=new Set(),fixed=[],exclude=new Set()){
+ const ok=i=>i.occ.includes(o)&&fits(i,o)&&wOK(i);
+ /* مستويات: 1) موسومة للمناسبة + نوعها يناسب + الجو يناسب  2) نوعها يناسب  3) الجو يناسب  4) أي شي (فقط للقطع الأساسية) */
+ const dist=i=>LV[i.sub]==null?.5:Math.abs(LV[i.sub]-(TGT[o]??1.5));
+ const nar=(c,l)=>{if(c=="acc"||l.length<2)return l;const m=Math.min(...l.map(dist));return l.filter(i=>dist(i)<=m+1)};
+ const av=c=>{const a=items.filter(i=>i.cat==c),f=a.filter(i=>!i.inw);return f.length?f:a};
+ const tier=(c,deep)=>{const all=av(c);let l=all.filter(ok);if(l.length)return nar(c,l);
+  l=all.filter(i=>fits(i,o)&&wOK(i));if(l.length)return nar(c,l);if(!deep)return[];
+  l=all.filter(wOK);if(l.length)return nar(c,l);return nar(c,all)};
+ const T=tier("top",1),B=tier("bottom",1),H=tier("thobe",0),J=tier("jacket",0),S=tier("shoes",1),A=[];/* الإكسسوارات ما تنضاف تلقائي */
+ const rnd=a=>a[Math.floor(Math.random()*a.length)];
+ const fx=new Set(fixed.map(f=>f.id)),have=c=>fixed.some(f=>f.cat==c),fixTB=have("top")||have("bottom");
+ const strictTB=T.some(ok)&&B.some(ok);
+ let thobeMode;if(have("thobe"))thobeMode=true;else if(fixTB)thobeMode=false;else if(strictTB&&H.length)thobeMode=Math.random()<.5;else if(strictTB)thobeMode=false;else if(H.length)thobeMode=true;else thobeMode=false;
+ const build=()=>{const p=[];
+  /* التيشيرت والسروال دايماً مع بعض */
+  if(thobeMode){if(!have("thobe")&&H.length)p.push(rnd(H))}else{if(!have("top")&&T.length)p.push(rnd(T));if(!have("bottom")&&B.length)p.push(rnd(B))}
+  if(!have("shoes")&&S.length)p.push(rnd(S));
+  if(!have("jacket")&&J.length&&weather=="بارد")p.push(rnd(J));
+  if(A.length){const seen=new Set(fixed.filter(f=>f.cat=="acc").map(f=>f.sub||f.id));const want=seen.size+1;const AA=A.filter(a=>thobeMode||a.sub!="شماغ / غترة").sort(()=>Math.random()-.5);for(const a of AA){if(seen.size>=want)break;const k=a.sub||a.id;if(!seen.has(k)){seen.add(k);p.push(a)}}}
+  return p.concat(fixed)};
+ const TM=tasteMap(),RC=new Set(Object.entries(log).filter(([d])=>Date.now()-new Date(d+"T12:00")<864e6).map(([,x])=>[...x].sort().join()));let cands=[];
+ for(let k=0;k<150;k++){const p=build();if(!p.length)continue;
+  const pair=thobeMode||(p.some(x=>x.cat=="top")&&p.some(x=>x.cat=="bottom"));
+  const ov=p.filter(x=>!fx.has(x.id)&&exclude.has(x.id)).length;const core=p.filter(x=>x.cat!="acc"),fit=core.reduce((a,x)=>a+dist(x),0)/(core.length||1);const sc=score(p)-fit*8+Math.min(8,(TM[pk(p)]||0)*2)-(RC.has(p.map(x=>x.id).sort().join())?15:0)+p.reduce((a,x)=>a+rec(x)-(avoid.has(x.id)?8:0),0)/p.length;let dn=0;for(let a=0;a<p.length;a++)for(let b=a+1;b<p.length;b++)if(dis.has(dk(p[a].id,p[b].id)))dn++;cands.push({p,sc,ov,pair,dn})}
+ if(!cands.length)return null;
+ if(cands.some(c=>c.pair))cands=cands.filter(c=>c.pair);
+ if(cands.some(c=>!c.dn))cands=cands.filter(c=>!c.dn);
+ const mo=Math.min(...cands.map(c=>c.ov));cands=cands.filter(c=>c.ov==mo).sort((a,b)=>b.sc-a.sc);const topSc=cands[0].sc,seenK=new Set(),pool2=cands.filter(c=>{const k=c.p.map(x=>x.id).sort().join();if(seenK.has(k)||c.sc<topSc-10)return false;seenK.add(k);return true});const best=pool2[Math.floor(Math.random()*pool2.length)];
+ const loose=best.p.filter(x=>x.cat!="acc"&&!fx.has(x.id)&&!ok(x)).map(x=>x.sub||CATS[x.cat]);
+ const miss=[];if(!S.length)miss.push("حذاء");
+ if(!best.p.some(x=>x.cat=="thobe")){const hT=best.p.some(x=>x.cat=="top"),hB=best.p.some(x=>x.cat=="bottom");if(!hT&&!hB)miss.push("قميص وبنطلون");else if(!hT)miss.push("تيشيرت أو قميص");else if(!hB)miss.push("بنطلون")}
+ const dirty=best.p.filter(x=>x.inw&&!fx.has(x.id)).map(x=>x.sub||CATS[x.cat]);
+ return{parts:best.p,sc:score(best.p),miss,fallback:loose.length>0,loose,dirty,occ:o}}
+const verdict=s=>s>=90?"🔥 ممتاز! الطقم هذا يجنن":s>=80?"👌 حلو، ألوانه متناسقة":s>=70?"🙂 مقبول، ما فيه شي غلط":"🤔 ألوانه شوي مزعجة، غيّره";
+/* views */
+const lockPiece=p=>{const L=cur.locked&&cur.locked.has(p.id);return `<div class="piece ${L?"sel":""}"><img src="${p.img}" alt="" loading="lazy" decoding="async"><span>${p.sub||CATS[p.cat]}</span>${cur.manual?"":`<div class="ab"><button onclick="lk(${p.id})">${L?"🔒":"🔓"}</button></div>`}</div>`};
+const pieceHTML=p=>`<div class="piece"><img src="${p.img}" alt="" loading="lazy" decoding="async"><span>${p.sub||CATS[p.cat]}</span></div>`;
+const thumbs=ps=>`<div class="thumbs">${ps.map(p=>`<img src="${p.img}" alt="" loading="lazy" decoding="async">`).join("")}</div>`;
+let dbDone=false;const dbWarn=()=>dbDone&&!db?`<div class="card" style="border-color:var(--rd)"><b>⚠️ التخزين ما اشتغل</b><div class="note">ما أقدر أحفظ قطعك على هالمتصفح (يمكن وضع التصفح الخاص). صدّر نسخة احتياطية قبل ما تقفل الصفحة.</div></div>`:"";
+const pk=ps=>{const g=c=>ps.find(p=>p.cat==c),a=g("top")||g("thobe"),b=g("bottom")||g("shoes");return a&&b?[a.color,b.color].sort().join("-"):null};
+function tasteMap(){const m={},add=(ids,w)=>{const k=pk((ids||[]).map($i).filter(Boolean));if(k)m[k]=(m[k]||0)+w};outfits.forEach(f=>add(f.ids,2));Object.values(log).forEach(x=>add(x,1));return m}
+function insights(){if(items.length<3)return"";const ds=Object.keys(log).sort().reverse(),
+th=ids=>(ids||[]).map($i).filter(Boolean).map(p=>`<img src="${p.img}" alt="" loading="lazy" style="width:44px;height:44px;object-fit:contain;border-radius:8px;background:var(--soft)">`).join(""),
+fd=d=>new Date(d+"T12:00").toLocaleDateString("ar-SA-u-ca-gregory",{weekday:"short",day:"numeric",month:"short"}),
+rows=ds.slice(0,5).map(d=>`<div style="display:flex;gap:6px;align-items:center;margin:8px 0"><span class="note" style="min-width:74px;margin:0">${fd(d)}</span>${th(log[d])}</div>`).join(""),cm={};
+ds.forEach(d=>{const k=[...log[d]].sort().join();(cm[k]=cm[k]||{n:0,ids:log[d]}).n++});
+const rp=Object.values(cm).filter(x=>x.n>1).sort((a,b)=>b.n-a.n)[0],tm=Object.entries(tasteMap()).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k])=>k.replace("-"," + ")).join("، ");
+const hist=`<details class="card fold" ${fk("hist")}><summary>📜 سجل الإطلالات</summary>${rows||'<div class="note">ما فيه سجل للحين. اضغط «ألبسه اليوم» وبيبدأ يتسجل.</div>'}${rp?`<div class="note">أكثر طقم تكرر (${rp.n} مرات):</div><div style="display:flex;gap:6px">${th(rp.ids)}</div>`:""}${tm?`<div class="note">ألوانك المفضلة في التنسيق: ${tm}. التطبيق يرجّحها في اقتراحاته ويتجنب تكرار نفس الطقم خلال ١٠ أيام.</div>`:""}</details>`;
+const g=[],cnt=c=>items.filter(i=>i.cat==c).length,neu=c=>items.some(i=>i.cat==c&&NEU.includes(i.color));
+if(cnt("top")&&!cnt("bottom")&&!cnt("thobe"))g.push("ما عندك أي بنطلون يكمل التيشيرتات.");
+if(cnt("bottom")&&!cnt("top")&&!cnt("thobe"))g.push("ما عندك أي تيشيرت أو قميص يكمل البناطيل.");
+if(!cnt("shoes"))g.push("ما عندك أي حذاء.");else if(!neu("shoes"))g.push("حذاء بلون محايد (أسود أو أبيض أو رمادي) يمشي مع أغلب طقومك.");
+if(cnt("bottom")&&!neu("bottom"))g.push("بنطلون بلون محايد يركب مع التيشيرتات الملونة.");
+if(cnt("bottom")&&cnt("top")>=2*cnt("bottom")+2)g.push(`عندك ${cnt("top")} تيشيرت مقابل ${cnt("bottom")} بنطلون. بنطلون زيادة يضاعف التنسيقات.`);
+if(!cnt("jacket")&&items.length>=5)g.push("جاكيت خفيف للأجواء الباردة والسهرات.");
+[...new Set(items.flatMap(i=>i.occ||[]))].forEach(o=>{const has=c=>items.some(i=>i.cat==c&&(i.occ||[]).includes(o));if(!has("shoes"))g.push(`ما عندك حذاء موسوم لمناسبة «${o}».`);if(!(has("thobe")||(has("top")&&has("bottom"))))g.push(`طقم كامل لمناسبة «${o}» ناقص (تيشيرت وبنطلون أو ثوب).`)});
+const gap=`<details class="card fold" ${fk("gap")}><summary>🧩 القطع الناقصة</summary>${g.length?g.slice(0,5).map(x=>`<div class="note" style="margin:8px 0">• ${x}</div>`).join(""):'<div class="note">خزانتك متوازنة، ما لقيت شي ناقص ✓</div>'}</details>`;
+return gap+hist}
+function render(){const ap=document.getElementById("app");if(window.__lt!=tab){ap.classList.remove("go");void ap.offsetWidth;ap.classList.add("go");window.__lt=tab}document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.t==tab));
+ document.getElementById("app").innerHTML=dbWarn()+({today:viewToday,week:viewWeek,style:viewStyle,closet:viewCloset,add:viewAdd})[tab]()}
+function bkNudge(){if(items.length<3)return"";let lb=0;try{lb=+localStorage.lb||0}catch(e){}if(lb&&Date.now()-lb<12096e5)return"";return `<div class="card"><b>💾 خذ نسخة احتياطية</b><div class="note">${lb?"مر أكثر من أسبوعين على آخر نسخة.":"ما أخذت أي نسخة احتياطية للحين."} بياناتك محفوظة في المتصفح فقط، ولو انمسح تضيع.</div><button class="btn alt" onclick="exp()">⬇️ تصدير الحين</button></div>`}
+function viewToday(){if(man)return viewMan();
+ let h=`<h1>${greet()}</h1>${nudgeHTML()}${bkNudge()}<div class="chips">`+OCC.map(o=>`<button class="chip ${o==occ?"on":""}" onclick="setOcc('${o}')">${o}</button>`).join("")+`</div><div class="chips">`+Object.keys(WEA).map(w=>`<button class="chip ${w==weather?"on":""}" onclick="setW('${w}')">${WEA[w]} ${w}</button>`).join("")+`<button class="chip ${wx?"on":""}" onclick="autoW()">📍 تلقائي${wx?" "+wxT+"°":""}</button></div>`;
+ if(items.length>=3){const dm=dormant();if(dm.length)h+=`<div class="note">💡 عندك ${dm.length} قطع ما لبستها من شهر أو أكثر، جرّب تلبسها</div>`}
+ if(items.length<3)return h+`<div class="card empty">خزانتك فاضية تقريباً 👕<br>أضف ٣ قطع على الأقل من تبويب «+ قطعة»</div>`;
+ if(cur){h+=`<div class="card">${board(cur.parts)}${cur.manual?"":`<div class="chips" style="justify-content:center">${cur.parts.map(p=>{const L=cur.locked&&cur.locked.has(p.id);return `<button class="chip ${L?"on":""}" onclick="lk(${p.id})">${L?"🔒":"🔓"} ${p.sub||CATS[p.cat]}</button>`}).join("")}</div>`}${cur.manual?"":`<div class="note">اضغط على القطعة اللي تبي تثبتها 🔓، وعند «غيّر الطقم» تتغير باقي القطع كلها.</div>`}<div class="score">التقييم: <b>${cur.sc}%</b></div><div class="bar"><i style="width:${cur.sc}%"></i></div><div>${verdict(cur.sc)}</div>`;
+  if(cur.loose&&cur.loose.length)h+=`<div class="note">ما عندك «${[...new Set(cur.loose)].join("، ")}» يناسب هالمناسبة بالضبط، فاخترت أقرب شي. أضف قطع أنسب أو عدّل مناسبات قطعك.</div>`;
+  if(cur.dirty&&cur.dirty.length)h+=`<div class="note">🧺 «${[...new Set(cur.dirty)].join("، ")}» في الغسيل وما لقيت بديل.</div>`;
+  if(cur.miss&&cur.miss.length)h+=`<div class="note">ينقصك: ${cur.miss.join("، ")}</div>`;
+  h+=`<div id="ai" class="ai" ${cur.ai?"":"hidden"}>${esc(cur.ai||"")}</div>`;
+  h+=`<button class="btn" onclick="wear()">ألبسه اليوم ✓</button><div class="row2"><button class="btn alt" onclick="${cur.manual?"cur=null;render()":"make()"}">${cur.manual?"رجوع":"غيّر الطقم"}</button><button class="btn alt" onclick="fav()">♡ احفظه</button></div><div class="chips" style="justify-content:center;margin-top:16px"><button class="chip" onclick="addOpen()">➕ إكسسوار أو جاكيت</button><button class="chip" onclick="disOpen()">👎 ما عجبني</button><button class="chip" onclick="shareImg(cur.parts.map(p=>p.id),'طقمي')">📤 شارك</button>${sample?`<button class="chip" onclick="ask()">🧥 رأي المصمم</button>`:""}</div></div>`}
+ else{const sv=log[today()];if(sv){const ps=sv.map($i).filter(Boolean);if(ps.length)h+=`<div class="card"><b>لبسك اليوم ✓</b>${board(ps)}${uw&&uw.d==today()?`<button class="btn alt" onclick="undoWear()">↩️ تراجع / غيّر طقم اليوم</button>`:""}</div>`}
+  h+=`<button class="btn" onclick="make()">اقترح لي طقم</button><button class="btn alt" onclick="man=new Set();render()">أنا اخترت طقمي، قيّمه لي</button>`}
+ const days=[];for(let i=1;i<=7;i++){const d=dstr(Date.now()-i*864e5);if(log[d])days.push(d)}
+ if(days.length)h+=`<h3>آخر ما لبسته</h3><div class="strip">`+days.map(d=>{const ps=log[d].map($i).filter(Boolean).slice(0,4);return `<div class="day"><div class="t">${ps.map(p=>`<img src="${p.img}" alt="" loading="lazy" decoding="async">`).join("")}</div>${new Date(d+"T12:00").toLocaleDateString("ar-SA-u-ca-gregory",{weekday:"short"})}</div>`}).join("")+`</div>`;
+ return h}
+function viewMan(){return `<h1>اختر قطعك</h1><div class="sub">اضغط على القطع اللي لابسها (${man.size} مختارة)</div><div class="grid">${items.map(i=>`<div class="piece ${man.has(i.id)?"sel":""}" onclick="tgM(${i.id})"><img src="${i.img}" alt="" loading="lazy" decoding="async"><span>${i.sub||CATS[i.cat]}</span></div>`).join("")}</div><button class="btn" onclick="rate()">قيّم طقمي</button><button class="btn alt" onclick="man=null;render()">إلغاء</button>`}
+function viewWeek(){if(!plan)initPlan();
+ let h=`<h1>خطة الأسبوع</h1><div class="sub">حدد مناسبة كل يوم وأنا أرتبها بدون تكرار (الجو: ${WEA[weather]} ${weather})</div><div class="card">`;
+ h+=plan.map((d,i)=>`<div class="wk"><b>${d.name} ${WEA[dw(i)]}</b><select onchange="plan[${i}].occ=this.value;plan[${i}].o=null">${OCC.map(o=>`<option ${o==d.occ?"selected":""}>${o}</option>`).join("")}</select><div style="flex:1">${d.ev?`<div class="note">📌 ${esc(d.ev)}</div>`:""}${d.o?thumbs(d.o.parts):`<span class="note">—</span>`}</div>${d.o?`<button class="chip" onclick="redo(${i})">🔄</button>`:""}</div>`).join("")+`</div>`;
+ if(items.length<3)return h+`<div class="empty">أضف قطع أول</div>`;
+ return h+`<button class="btn" onclick="planAll()">خطّط لي الأسبوع</button>`+evView()+tripHTML()}
+function viewCloset(){let h="";
+ const bk=`<details class="card fold" ${fk("bk")}><summary>💾 نسخة احتياطية</summary><div class="note">صدّر خزانتك كملف تحتفظ فيه، واستورده في أي جوال أو متصفح.</div><div class="row2"><button class="btn alt" onclick="exp()">⬇️ تصدير</button><label class="btn alt" for="imp" style="text-align:center;margin:10px 0 0">⬆️ استيراد</label></div><input id="imp" type="file" accept=".json,application/json" hidden onchange="imp(this)"></details>`;
+ if(outfits.length){h+=`<h1>طقومي المحفوظة</h1><div class="chips">${["all",...OCC].map(o=>`<button class="chip ${fo==o?"on":""}" onclick="fo='${o}';render()">${o=="all"?"الكل":o}</button>`).join("")}</div>`+outfits.filter(f=>fo=="all"||f.occ==fo).map(f=>{const ps=f.ids.map($i).filter(Boolean);if(!ps.length)return "";return `<div class="card"><b>${esc(f.name||"طقم بدون اسم")}</b><div class="note">${f.occ||""}</div>${board(ps)}<div class="row2"><button class="btn alt" onclick="useFav(${f.id})">اعرضه</button><button class="btn alt" onclick="editFav(${f.id})">عدّل</button><button class="btn alt" onclick="renFav(${f.id})">✏️ اسم</button></div><div class="row2"><button class="btn alt" onclick="shareFav(${f.id})">📤 شارك</button><button class="btn red" onclick="rmFav(${f.id})">حذف</button></div></div>`}).join("")}
+ if(!items.length)return h+`<h1>خزانتي</h1><div class="card empty">ما أضفت شي للحين</div>`+bk;
+ h+=insights();if(items.length>=3){const top=[...items].filter(i=>i.count).sort((a,b)=>b.count-a.count).slice(0,4),dm=dormant().slice(0,6);const st=(l,f)=>`<div class="strip">${l.map(i=>`<div class="day" onclick="edit(${i.id})"><div class="t" style="grid-template-columns:1fr"><img src="${i.img}" alt="" loading="lazy" decoding="async"></div>${f(i)}</div>`).join("")}</div>`;
+  h+=`<details class="card fold" ${fk("st")}><summary>📊 إحصائيات</summary>${top.length?`<div class="note">الأكثر لبساً</div>`+st(top,i=>i.count+"×"):`<div class="note">اضغط «ألبسه اليوم ✓» عشان تظهر إحصائيات اللبس</div>`}${dm.length?`<div class="note" style="margin-top:12px">ما انلبست من شهر أو أكثر</div>`+st(dm,i=>age(i)+" يوم"):""}</details>`;h+=laundryHTML()+analysisHTML()+disListHTML()}
+ const sel=(k,all,o)=>`<select onchange="fl.${k}=this.value;render()"><option value="">${all}</option>${o.map(([v,t])=>`<option value="${v}" ${fl[k]==v?"selected":""}>${t}</option>`).join("")}</select>`;
+ const okF=i=>(!fl.color||(i.colors||[i.color]).includes(fl.color))&&(!fl.season||(i.season||"all")==fl.season)&&(!fl.occ||i.occ.includes(fl.occ));
+ h+=`<h1>خزانتي (${items.length})</h1><div class="sub">✏️ تعديل أو 🗑️ حذف من الأزرار فوق كل قطعة</div>${items.filter(i=>!i.sub).length?`<div class="card"><b>⚠️ ${items.filter(i=>!i.sub).length} قطع بدون نوع دقيق</b><div class="note">بدونه التطبيق ما يعرف هل القطعة تيشيرت أو شورت أو حذاء، فما يقدر يفلتر حسب المناسبة. ${sample?"خلّ الذكاء الاصطناعي يحددها لك من الصور:":"اضغط «تحديد متعدد» تحت، حدد القطع اللي من نوع واحد، وبعدين اختر نوعها الدقيق."}</div>${sample?`<button class="btn" onclick="autoTag()">✨ حدد النوع تلقائي</button>`:""}</div>`:""}${seasonNudge()}${selBar()}<div class="chips">${["all",...Object.keys(CATS)].map(c=>`<button class="chip ${cf==c?"on":""}" onclick="cf='${c}';render()">${c=="all"?"الكل":CATS[c]}</button>`).join("")}</div><div class="row2">${sel("color","كل الألوان",COLORS.map(c=>[c,c]))}${sel("season","كل المواسم",Object.entries(SEAS))}${sel("occ","كل المناسبات",OCC.map(c=>[c,c]))}</div>`;
+ let n=0;for(const c in CATS){if(cf!="all"&&cf!=c)continue;const l=items.filter(i=>i.cat==c&&okF(i));if(!l.length)continue;n+=l.length;h+=`<h3>${CATS[c]} (${l.length})</h3>`;for(const s of [...SUBS[c],""]){const m=l.filter(i=>(i.sub||"")==s);if(!m.length)continue;h+=`<div class="note" style="margin:10px 0 6px">${s||"غير محدد"} (${m.length})</div><div class="grid">${m.map(i=>`<div class="piece ${msel.has(i.id)?"sel":""}" onclick="${selMode?`tgSel(${i.id})`:`edit(${i.id})`}"><div class="ab"><button onclick="event.stopPropagation();edit(${i.id})" aria-label="تعديل">✏️</button><button onclick="event.stopPropagation();rm(${i.id})" aria-label="حذف">🗑️</button><button onclick="event.stopPropagation();tgDirty(${i.id})" aria-label="الغسيل">🧺</button></div><img src="${i.img}" alt="" loading="lazy" decoding="async"><span>${i.season=="hot"?"☀️ ":i.season=="cold"?"❄️ ":""}${i.inw?"🧺 ":""}${(i.colors||[i.color]).join("، ")}${i.count?" · "+i.count+"×":""}</span></div>`).join("")}</div>`}}
+ if(!n)h+=`<div class="empty">ما فيه قطع تطابق الفلتر</div>`;
+ return h+bk}
+function viewAdd(){const h=busy?`<div class="busy">${busy}</div>`:"";
+ const pick=draft.img?`<div class="scanbox ${scanning?"on":""}"><img id="scimg" src="${draft.img}" alt="">${scanning?`<i class="cn a"></i><i class="cn b"></i><i class="cn c"></i><i class="cn d"></i><div class="beam"></div><div class="scanlbl" id="sct">يمسح القطعة ضوئياً...</div>`:""}</div>${foundHTML()}`:`<label class="pick" for="cam"><span style="font-size:32px">📷</span><span>صوّر القطعة</span></label><label class="pick" for="gal" style="min-height:80px"><span>🖼️ اختر من الاستديو (تقدر تختار عدة صور مرة وحدة)</span></label>`;
+ return `<h1>${editId?"تعديل القطعة":"قطعة جديدة"}</h1><div class="sub">${sample?"الذكاء الاصطناعي يعبي النوع واللون تلقائي ✨":"حدد النوع واللون والمناسبات"}</div>${h}<label class="note" style="display:flex;gap:8px;align-items:center;margin:8px 0"><input type="checkbox" ${autoClean?"checked":""} onchange="setAC(this.checked)"> امسح القطعة ضوئياً تلقائياً (خلفية بيضاء)</label>${pick}${draft.img?`<button class="btn alt" onclick="cropOpen()">✂️ قص وتكبير الصورة</button><button class="btn alt" onclick="cleanOpen()">📄 ماسح ضوئي (خلفية بيضاء)</button>${rawImg&&rawImg!=draft.img?`<button class="btn alt" onclick="draft.img=rawImg;render()">↩️ الصورة الأصلية</button>`:""}`:""}
+<input id="cam" type="file" accept="image/*" capture="environment" hidden onchange="onFile(this)"><input id="gal" type="file" accept="image/*" multiple hidden onchange="onFile(this)">
+<label>النوع</label><select onchange="draft.cat=this.value;draft.sub='';render()">${Object.entries(CATS).map(([k,v])=>`<option value="${k}" ${k==draft.cat?"selected":""}>${v}</option>`).join("")}</select>
+<label>النوع التفصيلي</label><select onchange="draft.sub=this.value"><option value="">— اختر —</option>${SUBS[draft.cat].map(s=>`<option ${s==draft.sub?"selected":""}>${s}</option>`).join("")}</select>
+<label>الألوان (اختر كل الألوان الواضحة في القطعة)</label><div class="chips">${COLORS.map(k=>`<button class="chip ${draft.colors.includes(k)?"on":""}" onclick="tgC('${k}')">${k}</button>`).join("")}</div>
+<label>الموسم</label><select onchange="draft.season=this.value">${Object.entries(SEAS).map(([k,v])=>`<option value="${k}" ${k==draft.season?"selected":""}>${v}</option>`).join("")}</select>
+<label>تنفع لـ</label><div class="chips">${OCC.map(o=>`<button class="chip ${draft.occ.includes(o)?"on":""}" onclick="tg('${o}')">${o}</button>`).join("")}</div>
+<button class="btn" onclick="save()">${editId?"حفظ التعديل":"حفظ القطعة"}</button>${editId?`<button class="btn red" onclick="rm(${editId})">حذف القطعة</button><button class="btn alt" onclick="editId=null;draft=newDraft();tab='closet';render()">إلغاء</button>`:""}`}
+/* actions */
+async function onFile(el){const fs=[...el.files];el.value="";if(!fs.length)return;
+ if(fs.length==1){rawImg=await shrink(fs[0]);draft.img=rawImg;draft.found=false;scanning=true;busy=null;render();startScanTxt();const t0=Date.now();
+  if(autoClean){draft.img=await clean(rawImg);const im1=document.getElementById("scimg");if(im1)im1.src=draft.img;if(!cleanOK)toast("ما قدرت أعزل القطعة عن الخلفية، جرّب زر 📄 الماسح وغيّر القوة")}
+  const t=await aiTag(draft.img);if(t)Object.assign(draft,t);else{const a=await analyze(draft.img);if(a){draft.colors=a.colors;draft.color=a.colors[0];draft.cat=a.cat;draft.sub=""}}
+  const wait=2800-(Date.now()-t0);if(wait>0)await new Promise(r=>setTimeout(r,wait));
+  scanning=false;stopScanTxt();draft.found=true;render();if(!draft.sub)toast("اختر النوع من «النوع التفصيلي»");return}
+ let pick="auto";if(!sample){pick=await askCat(fs.length);if(!pick)return}
+ for(let i=0;i<fs.length;i++){busy=`جاري تحليل وحفظ الصور ${i+1} / ${fs.length} ...`;const img0=await shrink(fs[i]);draft.img=img0;scanning=true;render();startScanTxt();const img=autoClean?await clean(img0):img0;const im2=document.getElementById("scimg");if(im2)im2.src=img;let t=await aiTag(img);await new Promise(r=>setTimeout(r,1500));if(!t){const a=await analyze(img)||{};t={colors:a.colors||["أسود"],cat:pick=="auto"?(a.cat||"top"):pick};t.color=t.colors[0]}
+  const it=Object.assign({id:Date.now()+i,img,cat:"top",sub:"",color:"أسود",colors:["أسود"],occ:["عادي"],season:"all",last:0,count:0},t);items.push(it);put("items",it)}
+ scanning=false;stopScanTxt();draft=newDraft();busy=null;tab="closet";render()}
+function tgC(c){const i=draft.colors.indexOf(c);i>=0?draft.colors.splice(i,1):draft.colors.push(c);draft.color=draft.colors[0]||"أسود";render()}
+function tg(o){const i=draft.occ.indexOf(o);i>=0?draft.occ.splice(i,1):draft.occ.push(o);render()}
+function save(){delete draft.found;if(!draft.colors.length)draft.colors=["أسود"];draft.color=draft.colors[0];if(!draft.img)return toast("صوّر القطعة أول");if(!draft.sub)return toast("اختر النوع التفصيلي (مثلاً تيشيرت، جينز، سنيكرز)");if(!draft.occ.length)return toast("اختر مناسبة وحدة على الأقل");
+ let it;if(editId){it=$i(editId);Object.assign(it,draft)}else{it=Object.assign({id:Date.now(),last:0,count:0},draft);items.push(it)}
+ put("items",it);editId=null;rawImg=null;draft=newDraft();tab="closet";render()}
+function edit(id){const i=$i(id);draft={colors:i.colors?[...i.colors]:[i.color],img:i.img,cat:i.cat,color:i.color,occ:[...i.occ],sub:i.sub||"",season:i.season||"all"};editId=id;rawImg=null;tab="add";render()}
+function confirmBox(msg,fn){const d=document.getElementById("dlg");d.innerHTML=`<div class="dbox"><div style="margin-bottom:6px">${msg}</div><div class="row2"><button class="btn red" id="dy">نعم، احذف</button><button class="btn alt" id="dn">إلغاء</button></div></div>`;d.hidden=false;document.getElementById("dy").onclick=()=>{d.hidden=true;fn()};document.getElementById("dn").onclick=()=>{d.hidden=true}}
+function toast(m){const t=document.getElementById("toast");t.textContent=m;t.hidden=false;clearTimeout(window._tt);window._tt=setTimeout(()=>{t.hidden=true},2500)}
+function purge(id){outfits=outfits.filter(f=>{f.ids=f.ids.filter(x=>x!=id);if(f.ids.length){put("outfits",f);return true}del("outfits",f.id);return false});events=events.filter(e=>{e.ids=e.ids.filter(x=>x!=id);if(e.ids.length){put("events",e);return true}del("events",e.id);return false});[...dis].forEach(k=>{if(k.split("-").map(Number).includes(+id))dis.delete(k)});saveDis();sty=sty.filter(x=>x!=id);plan=null}
+function rm(id){confirmBox("تحذف القطعة؟",()=>{items=items.filter(i=>i.id!=id);del("items",id);purge(id);editId=null;draft=newDraft();tab="closet";render();toast("انحذفت القطعة")})}
+function setOcc(o){occ=o;cur=null;render()}
+function setW(w){weather=w;wx=null;try{localStorage.aw="0"}catch(e){}cur=null;plan=plan?plan.map(d=>({...d,o:null})):null;render()}
+function make(){const prev=cur?cur.parts:[];const lk=cur&&cur.locked?cur.locked:new Set();
+ if(prev.length&&prev.every(p=>lk.has(p.id)))return toast("كل القطع مثبتة، فك القفل عن قطعة وحدة على الأقل");
+ const fixed=prev.filter(p=>lk.has(p.id));const ex=new Set(prev.filter(p=>!lk.has(p.id)).map(p=>p.id));
+ cur=gen(occ,new Set(),fixed,ex);if(cur)cur.locked=new Set(fixed.map(p=>p.id));render()}
+function lk(id){if(!cur)return;if(!cur.locked)cur.locked=new Set();cur.locked.has(id)?cur.locked.delete(id):cur.locked.add(id);render()}
+function tgM(id){man.has(id)?man.delete(id):man.add(id);render()}
+function rate(){const ps=[...man].map($i).filter(Boolean);if(!ps.length)return toast("اختر قطعة وحدة على الأقل");cur={parts:ps,sc:score(ps),miss:[],manual:true,occ};man=null;render()}
+let uw=null;try{uw=JSON.parse(localStorage.uw||"null")}catch(e){}
+function saveUw(){try{uw?localStorage.uw=JSON.stringify(uw):localStorage.removeItem("uw")}catch(e){}}
+function revertWear(){if(!uw||uw.d!=today())return;for(const k in uw.p){const it=$i(k),s=uw.p[k];if(!it)continue;it.last=s.last;it.count=s.count;it.since=s.since;it.inw=s.inw;put("items",it)}if(uw.pl){log[uw.d]=uw.pl;put("log",{d:uw.d,ids:uw.pl})}else{delete log[uw.d];del("log",uw.d)}uw=null;saveUw()}
+function undoWear(){revertWear();toast("تم التراجع ↩️");render()}
+function wear(){if(!cur)return;revertWear();const p0={};cur.parts.forEach(p=>{const it=$i(p.id);if(it)p0[p.id]={last:it.last||0,count:it.count||0,since:it.since||0,inw:!!it.inw}});uw={d:today(),p:p0,pl:log[today()]||null};saveUw();cur.parts.forEach(p=>{const it=$i(p.id);it.last=Date.now();it.count=(it.count||0)+1;it.since=(it.since||0)+1;if(WASH.includes(it.cat)&&it.since>=thrOf(it.cat))it.inw=true;put("items",it)});log[today()]=cur.parts.map(p=>p.id);put("log",{d:today(),ids:log[today()]});cur=null;render()}
+function fav(){if(!cur)return;const f={id:Date.now(),ids:cur.parts.map(p=>p.id),occ:cur.occ||occ};outfits.unshift(f);put("outfits",f);toast("انحفظ في خزانتي ♡")}
+function rmFav(id){outfits=outfits.filter(f=>f.id!=id);del("outfits",id);render()}
+function useFav(id){const f=outfits.find(x=>x.id==id);const ps=f.ids.map($i).filter(Boolean);cur={parts:ps,sc:score(ps),miss:[],manual:true,occ:f.occ};tab="today";render()}
+async function ask(){if(!cur||!sample)return;const el=document.getElementById("ai");el.hidden=false;el.textContent="المصمم يفكر...";
+ try{const r=await sample("الصور هي قطع طقم واحد لشخص رايح: "+(cur.occ||occ)+"، والجو: "+weather+". أنت مصمم أزياء بذوق عالي. علّق بلهجة سعودية خفيفة وودودة في ٣ جمل كحد أقصى: هل الطقم يناسب المناسبة؟ وش الحلو فيه؟ وتعديل بسيط واحد إذا فيه (مثلاً قطعة أو إكسسوار).",{images:cur.parts.map(p=>blobOf(p.img)),onText:({text})=>{el.textContent=text}});cur.ai=r.text}
+ catch(e){el.textContent=e.code=="not_granted"?"ما سمحت للتطبيق.":"ما قدرت أجيب رأي المصمم الحين، جرب بعدين.";}}
+let sty=[],stf="all";
+const styParts=()=>sty.map($i).filter(Boolean);
+function tgS(id){const i=sty.indexOf(id);i>=0?sty.splice(i,1):sty.push(id);render()}
+function viewStyle(){const ps=styParts();
+ let h=`<h1>تنسيق</h1><div class="sub">اختر القطع وركّب طقمك بنفسك، وتنعرض صورتين جنب بعض</div><div class="chips">${OCC.map(o=>`<button class="chip ${o==occ?"on":""}" onclick="occ='${o}';render()">${o}</button>`).join("")}</div>`;
+ if(ps.length){const sc=score(ps);h+=`<div class="card">${board(ps)}<div class="chips" style="justify-content:center">${ps.map(p=>`<button class="chip" onclick="tgS(${p.id})">✕ ${p.sub||CATS[p.cat]}</button>`).join("")}</div><div class="score">التقييم: <b>${sc}%</b></div><div class="bar"><i style="width:${sc}%"></i></div><div>${verdict(sc)}</div>${sample?`<button class="btn alt" onclick="styAsk()">🧥 رأي المصمم</button>`:""}<div class="row2"><button class="btn alt" onclick="styFav()">${stEdit?"💾 حدّث الطقم":"♡ احفظ الطقم"}</button><button class="btn alt" onclick="sty=[];stEdit=null;render()">مسح</button></div><button class="btn alt" onclick="shareImg(sty,'طقمي')">📤 شارك الطقم</button><button class="btn" onclick="styWear()">ألبسه اليوم ✓</button></div>`}
+ else h+=`<div class="card empty">اختر قطع من تحت وتظهر هنا 👇</div>`;
+ if(!items.length)return h+`<div class="empty">خزانتك فاضية، أضف قطع أول</div>`;
+ h+=`<h3>خزانتي</h3><div class="chips">${["all",...Object.keys(CATS)].map(c=>`<button class="chip ${stf==c?"on":""}" onclick="stf='${c}';render()">${c=="all"?"الكل":CATS[c]}</button>`).join("")}</div><div class="grid">${items.filter(i=>stf=="all"||i.cat==stf).map(i=>`<div class="piece ${sty.includes(i.id)?"sel":""}" onclick="tgS(${i.id})"><img src="${i.img}" alt="" loading="lazy" decoding="async"><span>${i.sub||CATS[i.cat]}${sty.includes(i.id)?" ✓":""}</span></div>`).join("")}</div>`;
+ return h}
+function styFav(){const ps=styParts();if(!ps.length)return toast("اختر قطعة أول");if(stEdit){const f=outfits.find(x=>x.id==stEdit);if(f){f.ids=ps.map(p=>p.id);f.occ=occ;put("outfits",f);stEdit=null;render();return toast("تم تحديث الطقم ✓")}}const f={id:Date.now(),ids:ps.map(p=>p.id),occ};outfits.unshift(f);put("outfits",f);toast("انحفظ في خزانتي ♡")}
+function styWear(){const ps=styParts();if(!ps.length)return toast("اختر قطعة أول");cur={parts:ps,sc:score(ps),miss:[],manual:true,occ};wear();sty=[];tab="today";render();toast("انسجل لبسك اليوم ✓")}
+function styAsk(){const ps=styParts();if(!ps.length)return;cur={parts:ps,sc:score(ps),miss:[],manual:true,occ};tab="today";render();ask()}
+/* week */
+function initPlan(){plan=[];for(let i=0;i<7;i++){const d=new Date(Date.now()+i*864e5);plan.push({name:i==0?"اليوم":d.toLocaleDateString("ar-SA-u-ca-gregory",{weekday:"long"}),occ:[5,6].includes(d.getDay())?"عادي":"دوام",o:null,date:dstr(d)})}}
+const esc=t=>String(t).replace(/[&<>"']/g,c=>"&#"+c.charCodeAt(0)+";");
+const age=i=>Math.floor((Date.now()-(i.last||i.id))/864e5),dormant=()=>items.filter(i=>age(i)>=30).sort((a,b)=>age(b)-age(a));
+const dw=i=>wx&&wx[i]?wx[i]:weather,resv=()=>new Set(events.filter(e=>e.date>=today()).flatMap(e=>e.ids));
+function planAll(){const used=resv();plan.forEach((d,i)=>{const e=events.find(x=>x.date==d.date);if(e){d.occ=e.occ;d.ev=e.title;const ps=e.ids.map($i).filter(Boolean);d.o={parts:ps,sc:score(ps)};ps.forEach(p=>used.add(p.id));return}d.ev=null;const w=weather;weather=dw(i);const o=gen(d.occ,used);weather=w;d.o=o;if(o)o.parts.forEach(p=>used.add(p.id))});render()}
+function redo(i){const d=plan[i];if(d.ev)return toast("هذا اليوم مرتبط بمناسبة، غيّره من قسم المناسبات");const used=resv();plan.forEach((x,j)=>{if(j!=i&&x.o)x.o.parts.forEach(p=>used.add(p.id))});const w=weather;weather=dw(i);d.o=gen(d.occ,used,[],new Set(d.o?d.o.parts.map(p=>p.id):[]));weather=w;render()}
+/* weather */
+const CITIES=[["الرياض",24.71,46.68],["جدة",21.54,39.17],["مكة",21.39,39.86],["المدينة",24.47,39.61],["الدمام",26.43,50.1],["الخبر",26.28,50.21],["الأحساء",25.38,49.59],["الطائف",21.27,40.42],["أبها",18.22,42.51],["تبوك",28.38,36.57],["بريدة",26.33,43.97],["حائل",27.52,41.7],["جازان",16.89,42.55],["نجران",17.49,44.13],["سكاكا",29.97,40.21],["ينبع",24.09,38.06],["الباحة",20.01,41.47],["عرعر",30.97,41.02],["الكويت",29.38,47.99],["المنامة",26.23,50.59],["الدوحة",25.29,51.53],["دبي",25.2,55.27],["مسقط",23.59,58.41]];
+function autoW(){const d=document.getElementById("dlg");d.innerHTML=`<div class="dbox" style="max-height:92vh;overflow:auto"><div>📍 حدد موقعك لجلب الجو</div><button class="btn" onclick="gps()">حدد موقعي تلقائي</button><div class="note" style="margin:12px 0 6px">أو اختر مدينتك:</div><div class="chips" style="justify-content:center">${CITIES.map(([n,a,b])=>`<button class="chip" onclick="getW(${a},${b})">${n}</button>`).join("")}</div><button class="btn alt" onclick="document.getElementById('dlg').hidden=true">إلغاء</button></div>`;d.hidden=false}
+function gps(){if(!window.isSecureContext||!navigator.geolocation)return toast("تحديد الموقع يحتاج رابط https، اختر مدينتك من القائمة");navigator.geolocation.getCurrentPosition(p=>getW(p.coords.latitude,p.coords.longitude),e=>toast(e.code==1?"ما انسمح بالموقع، فعّله من إعدادات المتصفح أو اختر مدينتك":"ما قدرت أحدد موقعك، اختر مدينتك"),{timeout:10000,maximumAge:6e5})}
+async function getW(a,b,q){q||toast("جاري جلب الجو...");try{const r=await(await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${a}&longitude=${b}&daily=temperature_2m_max&current=temperature_2m&timezone=auto&forecast_days=7`)).json(),k=t=>t>=30?"حار":t<=17?"بارد":"معتدل";wx=r.daily.temperature_2m_max.map(k);wxT=Math.round(r.daily.temperature_2m_max[0]);weather=wx[0];cur=null;plan=plan?plan.map(d=>({...d,o:null})):null;try{localStorage.aw="1";localStorage.awc=a+","+b}catch(e){}document.getElementById("dlg").hidden=true;render()}catch(e){q||toast("ما قدرت أجيب الجو، تأكد من الإنترنت أو اختر حار / معتدل / بارد من الأزرار")}}
+/* events */
+function evView(){const l=events.filter(e=>e.date>=today()).sort((a,b)=>a.date<b.date?-1:1);return `<h3>📌 مناسبات قادمة</h3>`+l.map(e=>{const ps=e.ids.map($i).filter(Boolean);return `<div class="card"><b>${esc(e.title)}</b><div class="note">${new Date(e.date+"T12:00").toLocaleDateString("ar-SA-u-ca-gregory",{weekday:"long",day:"numeric",month:"long"})} · ${e.occ}</div>${board(ps)}<div class="row2"><button class="btn alt" onclick="evRedo(${e.id})">🔄 غيّر</button><button class="btn alt" onclick="evShare(${e.id})">📤</button><button class="btn red" onclick="evDel(${e.id})">حذف</button></div></div>`}).join("")+`<details class="card fold" ${fk("ev")}><summary>➕ مناسبة جديدة</summary><input id="et" class="inp" placeholder="اسم المناسبة (مثلاً: عزيمة الخميس)"><input id="ed" class="inp" type="date" min="${today()}"><select id="eo">${OCC.map(o=>`<option>${o}</option>`).join("")}</select><button class="btn" onclick="evAdd()">اقترح طقم وتجنّب تكراره</button></details>`}
+function mkEv(date,o,ex){const di=Math.round((new Date(date+"T12:00")-new Date(today()+"T12:00"))/864e5),w=weather;if(wx&&wx[di])weather=wx[di];const r=gen(o,resv(),[],ex);weather=w;return r}
+function evAdd(){const t=document.getElementById("et").value.trim(),d=document.getElementById("ed").value,o=document.getElementById("eo").value;if(!t||!d)return toast("اكتب اسم المناسبة والتاريخ");if(items.length<3)return toast("أضف ٣ قطع على الأقل");const r=mkEv(d,o,new Set());if(!r)return toast("ما قدرت أركّب طقم");const e={id:Date.now(),title:t,date:d,occ:o,ids:r.parts.map(p=>p.id)};events.push(e);put("events",e);plan=null;render()}
+function evRedo(id){const e=events.find(x=>x.id==id),r=mkEv(e.date,e.occ,new Set(e.ids));if(r){e.ids=r.parts.map(p=>p.id);put("events",e);plan=null;render()}}
+function evDel(id){events=events.filter(e=>e.id!=id);del("events",id);plan=null;render()}
+function evShare(id){const e=events.find(x=>x.id==id);shareImg(e.ids,e.title)}
+/* saved outfits */
+function renFav(id){const f=outfits.find(x=>x.id==id),n=prompt("اسم الطقم",f.name||"");if(n!==null){f.name=n.trim().slice(0,40);put("outfits",f);render()}}
+function editFav(id){const f=outfits.find(x=>x.id==id);sty=f.ids.filter($i);occ=OCC.includes(f.occ)?f.occ:occ;stEdit=id;tab="style";render();scrollTo(0,0)}
+function shareFav(id){const f=outfits.find(x=>x.id==id);shareImg(f.ids,f.name||"طقمي")}
+/* share as image */
+function slots(ps){const g=c=>ps.filter(p=>p.cat==c),th=g("thobe")[0],tp=g("top")[0],bt=g("bottom")[0],sh=g("shoes")[0],o=[];
+ if(th)o.push([th,22,1,56,84]);else{if(tp)o.push([tp,22,1,56,34]);if(bt)o.push([bt,22,tp?33:2,56,tp?50:80])}
+ if(sh)o.push([sh,22,th||bt||tp?83:20,56,16]);
+ ps.filter(p=>!o.some(x=>x[0]===p)&&p.cat!="acc").slice(0,4).forEach((p,i)=>o.push([p,0,4+i*23,30,22]));
+ g("acc").slice(0,5).forEach((a,i)=>o.push([a,76,3+i*18,24,17]));return o}
+const board=ps=>`<div class="board">${slots(ps).map(([p,l,t,w,h])=>`<img src="${p.img}" style="left:${l}%;top:${t}%;width:${w}%;height:${h}%">`).join("")}</div>`;
+async function shareImg(ids){const ps=ids.map($i).filter(Boolean);if(!ps.length)return;const W=900,H=1215,c=document.createElement("canvas");c.width=W;c.height=H;const g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,W,H);g.globalCompositeOperation="multiply";
+ await Promise.all(slots(ps).map(([p,l,t,w,h])=>new Promise(r=>{const im=new Image();im.onload=()=>{const bw=W*w/100,bh=H*h/100,k=Math.min(bw/im.width,bh/im.height),dw=im.width*k,dh=im.height*k;g.drawImage(im,W*l/100+(bw-dw)/2,H*t/100+(bh-dh)/2,dw,dh);r()};im.src=p.img})));
+ c.toBlob(async b=>{const f=new File([b],"outfit.jpg",{type:"image/jpeg"});try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f]});return}}catch(e){if(e.name=="AbortError")return}await saveFile("outfit.jpg",b)},"image/jpeg",.92)}
+/* background cleanup */
+let scanning=false,scTimer;
+const COLHEX={"أسود":"#111","أبيض":"#fff","رمادي":"#8a8f98","بيج":"#d8c3a0","كحلي":"#1c2a4a","بني":"#6b4a2f","أخضر":"#3f7d4a","زيتي":"#6b6b2f","أحمر":"#c0392b","أزرق":"#2f6fd0","أصفر":"#e5b92a","وردي":"#e58aa8","فضي":"#c0c4cc","ذهبي":"#c9a227"};
+const SCT=["يمسح القطعة ضوئياً...","يحدد النوع...","يحلل الألوان...","يتأكد من الموسم والمناسبة..."];
+function startScanTxt(){let i=0;clearInterval(scTimer);scTimer=setInterval(()=>{const e=document.getElementById("sct");if(e)e.textContent=SCT[++i%SCT.length]},900)}
+function stopScanTxt(){clearInterval(scTimer)}
+function foundHTML(){if(scanning||!draft.found)return "";const cols=draft.colors||[draft.color];return `<div class="found"><div class="ft">✓ تم التعرف على القطعة</div><div class="fr"><span class="fb" style="--d:0s">${draft.sub||CATS[draft.cat]}</span>${cols.map((c,i)=>`<span class="fb" style="--d:${(.12*(i+1)).toFixed(2)}s"><i class="dot" style="background:${COLHEX[c]||"#999"}"></i>${c}</span>`).join("")}${draft.season&&draft.season!="all"?`<span class="fb" style="--d:.55s">${draft.season=="hot"?"☀️ صيفي":"❄️ شتوي"}</span>`:""}<label class="fb" for="cam" style="--d:.7s;cursor:pointer">📷 غيّر الصورة</label></div></div>`}
+let cleanOK=true,showRaw=false;
+function clean(src,tol=42){return new Promise(r=>{const im=new Image();im.onload=()=>{try{r(scan(im,tol,src))}catch(e){cleanOK=false;r(src)}};im.onerror=()=>{cleanOK=false;r(src)};im.src=src})}
+function scan(im,tol,src){const M=720,k=Math.min(1,M/Math.max(im.width,im.height)),w=Math.round(im.width*k),h=Math.round(im.height*k),N=w*h;
+ const c=document.createElement("canvas");c.width=w;c.height=h;const g=c.getContext("2d",{willReadFrequently:true});g.drawImage(im,0,0,w,h);
+ const d=g.getImageData(0,0,w,h),p=d.data,L=new Float32Array(N),A=new Float32Array(N),B=new Float32Array(N);
+ for(let i=0;i<N;i++){const r=p[i*4],q=p[i*4+1],b=p[i*4+2];L[i]=.299*r+.587*q+.114*b;A[i]=r-q;B[i]=(r+q)/2-b}
+ const bl=[],ba=[],bb=[],t=Math.max(2,Math.round(Math.min(w,h)*.015));
+ for(let y=0;y<h;y+=2)for(let x=0;x<w;x+=2)if(x<t||y<t||x>=w-t||y>=h-t){const i=y*w+x;bl.push(L[i]);ba.push(A[i]);bb.push(B[i])}
+ const med=a=>a.sort((u,v)=>u-v)[a.length>>1],mL=med(bl),mA=med(ba),mB=med(bb);
+ const dist=i=>{const a=(L[i]-mL)*.45,b=A[i]-mA,e=B[i]-mB;return Math.sqrt(a*a+b*b+e*e)};
+ const G=new Float32Array(N);for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){const i=y*w+x;G[i]=Math.abs(L[i+1]-L[i-1])+Math.abs(L[i+w]-L[i-w])}
+ const Tc=tol*.8,Te=8+tol*.25,bgm=new Uint8Array(N),stk=new Int32Array(N);let sp=0;
+ const push=i=>{if(!bgm[i]&&dist(i)<Tc&&G[i]<Te){bgm[i]=1;stk[sp++]=i}};
+ for(let x=0;x<w;x++){push(x);push((h-1)*w+x)}for(let y=0;y<h;y++){push(y*w);push(y*w+w-1)}
+ while(sp){const i=stk[--sp],x=i%w;if(x>0)push(i-1);if(x<w-1)push(i+1);if(i>=w)push(i-w);if(i<N-w)push(i+w)}
+ const lab=new Int32Array(N),sizes=[0],qq=new Int32Array(N);let nl=0;
+ for(let s0=0;s0<N;s0++){if(bgm[s0]||lab[s0])continue;nl++;let a=0,b2=0;qq[b2++]=s0;lab[s0]=nl;
+  while(a<b2){const i=qq[a++],x=i%w;const vis=j=>{if(!bgm[j]&&!lab[j]){lab[j]=nl;qq[b2++]=j}};if(x>0)vis(i-1);if(x<w-1)vis(i+1);if(i>=w)vis(i-w);if(i<N-w)vis(i+w)}
+  sizes[nl]=b2}
+ const mx=Math.max(0,...sizes);for(let i=0;i<N;i++)if(!bgm[i]&&sizes[lab[i]]<Math.max(mx*.08,N*.002))bgm[i]=1;
+ let fg=0;for(let i=0;i<N;i++)if(!bgm[i])fg++;
+ if(fg<N*.03||fg>N*.9){cleanOK=false;return src}
+ cleanOK=true;
+ for(let i=0;i<N;i++){if(bgm[i]){p[i*4]=p[i*4+1]=p[i*4+2]=255;continue}const x=i%w;
+  if((x>0&&bgm[i-1])||(x<w-1&&bgm[i+1])||(i>=w&&bgm[i-w])||(i<N-w&&bgm[i+w])){const a=Math.max(.35,Math.min(1,(dist(i)-Tc*.3)/(Tc*.9)));for(let j=0;j<3;j++)p[i*4+j]=Math.round(p[i*4+j]*a+255*(1-a))}}
+ g.putImageData(d,0,0);
+ let x0=w,y0=h,x1=0,y1=0;for(let i=0;i<N;i++)if(!bgm[i]){const x=i%w,y=(i/w)|0;if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
+ const bw=x1-x0+1,bh=y1-y0+1,S=640,sc=Math.min(2,S*.86/bw,S*.86/bh);
+ const o=document.createElement("canvas");o.width=o.height=S;const og=o.getContext("2d");og.fillStyle="#fff";og.fillRect(0,0,S,S);og.imageSmoothingQuality="high";
+ og.drawImage(c,x0,y0,bw,bh,(S-bw*sc)/2,(S-bh*sc)/2,bw*sc,bh*sc);return o.toDataURL("image/jpeg",.92)}
+function setAC(v){autoClean=v;try{localStorage.ac=v?"1":"0"}catch(e){}}
+function cleanOpen(){const d=document.getElementById("dlg");d.innerHTML=`<div class="dbox" style="max-height:92vh;overflow:auto"><div>📄 الماسح الضوئي</div><img id="cp" style="width:100%;border-radius:18px;background:#fff;margin-top:10px"><div id="cn" class="note"></div><label>قوة المسح</label><input type="range" min="10" max="110" value="42" style="width:100%" onchange="cleanPrev(+this.value)"><div class="note">لو اختفى جزء من القطعة قلّل القوة، ولو بقت خلفية زِدها.</div><div class="row2"><button class="btn alt" onclick="tgRaw()">👁️ قارن بالأصلي</button></div><div class="row2"><button class="btn" onclick="cleanOk()">تطبيق</button><button class="btn alt" onclick="document.getElementById('dlg').hidden=true">إلغاء</button></div></div>`;d.hidden=false;cleaned=null;showRaw=false;cleanPrev(42)}
+async function cleanPrev(t){const n=document.getElementById("cn");n.textContent="جاري المسح...";cleaned=await clean(rawImg||draft.img,t);showRaw=false;document.getElementById("cp").src=cleaned;n.textContent=cleanOK?"":"ما قدرت أعزل القطعة، جرّب تغيّر القوة أو صوّرها على خلفية سادة."}
+function tgRaw(){showRaw=!showRaw;document.getElementById("cp").src=showRaw?(rawImg||draft.img):cleaned}
+function cleanOk(){if(cleaned){if(!rawImg)rawImg=draft.img;draft.img=cleaned}document.getElementById("dlg").hidden=true;render()}
+/* auto analysis (no AI needed) */
+function cname(r,g,b){const mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn,l=(mx+mn)/510,s=d?d/(255-Math.abs(mx+mn-255)):0;let h=0;if(d){h=mx==r?((g-b)/d+6)%6:mx==g?(b-r)/d+2:(r-g)/d+4;h*=60}
+ if(l<.15)return"أسود";if(l>.9)return"أبيض";if(s<.14)return l<.3?"أسود":l<.8?"رمادي":"أبيض";
+ if(h<15||h>=345)return l>.7?"وردي":l<.3?"بني":"أحمر";
+ if(h<50)return s<.5&&l>.5?"بيج":l<.5?"بني":h<35?"أحمر":"أصفر";
+ if(h<70)return l>.45?"أصفر":"زيتي";if(h<90)return l<.5?"زيتي":"أخضر";if(h<200)return h<165?"أخضر":"أزرق";
+ if(h<260)return l<.38?"كحلي":"أزرق";if(h<300)return l>.65?"وردي":"كحلي";return l>.5?"وردي":"أحمر"}
+function analyze(src){return new Promise(r=>{const im=new Image();im.onload=()=>{const N=64,c=document.createElement("canvas");c.width=c.height=N;const g=c.getContext("2d");g.drawImage(im,0,0,N,N);const p=g.getImageData(0,0,N,N).data;let R=0,G=0,B=0,n=0;
+ for(let k=0;k<N;k++)for(const[x,y]of[[k,0],[k,N-1],[0,k],[N-1,k]]){const i=(y*N+x)*4;R+=p[i];G+=p[i+1];B+=p[i+2];n++}R/=n;G/=n;B/=n;
+ const cnt={};let tot=0,x0=N,x1=0,y0=N,y1=0;
+ for(let y=0;y<N;y++)for(let x=0;x<N;x++){const i=(y*N+x)*4,a=p[i]-R,b=p[i+1]-G,e=p[i+2]-B;if(a*a+b*b+e*e<1800)continue;tot++;if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;const k=cname(p[i],p[i+1],p[i+2]);cnt[k]=(cnt[k]||0)+1}
+ const small=tot<N*N*.06;let cols;if(small)cols=[cname(R,G,B)];else cols=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).filter((x,i)=>i==0||x[1]>tot*.2).slice(0,3).map(x=>x[0]);
+ const asp=(x1-x0+1)/(y1-y0+1),area=tot/(N*N);let cat="top";if(!small){if(area<.12)cat="acc";else if(asp<.72)cat="bottom"}
+ r({colors:cols,cat})};im.onerror=()=>r(null);im.src=src})}
+function askCat(n){return new Promise(res=>{const d=document.getElementById("dlg");d.innerHTML=`<div class="dbox"><div>${n} صور، وش نوعها؟</div><div class="note" style="margin-bottom:8px">اختر نوع القطع، والألوان أحللها تلقائي من الصور.</div><div class="chips" style="justify-content:center">${Object.entries(CATS).map(([k,v])=>`<button class="chip" data-k="${k}">${v}</button>`).join("")}<button class="chip on" data-k="auto">تخمين تلقائي</button></div><button class="btn alt" data-k="">إلغاء</button></div>`;d.hidden=false;d.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>{d.hidden=true;res(b.dataset.k)})})}
+const selBar=()=>selMode?`<div class="card"><b>تحديد متعدد (${msel.size})</b><div class="note">اضغط على القطع، ثم اختر نوعها:</div><div class="chips">${Object.entries(CATS).map(([k,v])=>`<button class="chip" onclick="setCat('${k}')">${v}</button>`).join("")}</div><select onchange="setSub(this.value)" style="margin-top:8px"><option value="">حدد النوع الدقيق للمحدد (حذاء، تيشيرت، جينز...)</option>${Object.entries(SUBS).map(([c,l])=>`<optgroup label="${CATS[c]}">${l.map(x=>`<option value="${c}|${x}">${x}</option>`).join("")}</optgroup>`).join("")}</select><div class="row2"><button class="btn alt" onclick="reColor()">🎨 حلل ألوان المحدد</button><button class="btn alt" onclick="msel=new Set();selMode=false;render()">تم</button></div></div>`:`<div class="row2"><button class="btn alt" onclick="selMode=true;render()">☑️ تحديد متعدد وتصحيح الأنواع</button><button class="btn alt" onclick="reColor(1)">🎨 حلل ألوان الكل</button></div>`;
+function seasonNudge(){const n=items.filter(i=>i.cat!="acc"&&(i.season||"all")=="all"&&!i.sd).length;if(!n)return "";return `<div class="card"><b>🌦️ ${n} قطعة موسمها «كل الأوقات»</b><div class="note">بدون تحديد الموسم التطبيق ما يقدر يستبعد الشتوي في الحر والصيفي في البرد. أحدده لك من نوع القطعة${sample?" وصورتها":""}.</div><button class="btn" onclick="autoSeason()">🌦️ حدد الموسم تلقائي</button></div>`}
+async function autoSeason(){const l=items.filter(i=>(i.season||"all")=="all"&&!i.sd);if(!l.length)return toast("كل القطع محددة الموسم ✓");let ch=0;
+ for(const it of l){const r=seasonRule(it.sub);if(r!="all"){it.season=r;it.sd=1;put("items",it);ch++}}
+ const rest=l.filter(i=>(i.season||"all")=="all");let k=0;
+ if(sample){for(const it of rest){toast(`جاري تحديد الموسم ${++k} / ${rest.length} ...`);const t=await aiTag(it.img);if(t&&t.season&&t.season!="all"){it.season=t.season;ch++}it.sd=1;put("items",it)}}
+ else rest.forEach(it=>{it.sd=1;put("items",it)});
+ toast(ch?`تم تحديد الموسم لـ ${ch} قطعة ✓`:"القطع كلها تصلح لكل الأوقات");render()}
+async function autoTag(all){if(!sample)return toast("الميزة غير متاحة في هذه النسخة");const l=all?items:items.filter(i=>!i.sub);if(!l.length)return toast("كل القطع محددة ✓");let k=0,f=0;
+ for(const it of l){toast(`جاري تحديد القطع ${++k} / ${l.length} ...`);const t=await aiTag(it.img);if(t&&t.sub){Object.assign(it,t);put("items",it)}else f++;if(k%3==0)render()}
+ toast(f?`تم، و${f} قطع ما قدرت أحددها`:"تم تحديد كل القطع ✓");render()}
+function setSub(v){if(!v)return;if(!msel.size)return toast("اختر قطع أول");const[c,x]=v.split("|");items.filter(i=>msel.has(i.id)).forEach(i=>{i.cat=c;i.sub=x;put("items",i)});msel=new Set();toast("تم تحديد النوع ✓");render()}
+function tgSel(id){msel.has(id)?msel.delete(id):msel.add(id);render()}
+function setCat(k){if(!msel.size)return toast("اختر قطع أول");items.filter(i=>msel.has(i.id)).forEach(i=>{i.cat=k;i.sub="";put("items",i)});msel=new Set();toast("تم تغيير النوع ✓");render()}
+async function reColor(all){const l=all?items:items.filter(i=>msel.has(i.id));if(!l.length)return toast("اختر قطع أول");toast("جاري تحليل الألوان...");for(const it of l){const a=await analyze(it.img);if(a){it.colors=a.colors;it.color=a.colors[0];put("items",it)}}toast("تم تحليل الألوان ✓");render()}
+/* crop */
+function cropOpen(){cr={z:1,x:.5,y:.5};const d=document.getElementById("dlg");d.innerHTML=`<div class="dbox" style="max-height:92vh;overflow:auto"><canvas id="cv" style="width:100%;border-radius:14px"></canvas><label>تكبير</label><input type="range" min="1" max="3" step=".05" value="1" style="width:100%" oninput="cr.z=+this.value;cropDraw()"><label>يمين / يسار</label><input type="range" min="0" max="1" step=".01" value=".5" style="width:100%" oninput="cr.x=+this.value;cropDraw()"><label>فوق / تحت</label><input type="range" min="0" max="1" step=".01" value=".5" style="width:100%" oninput="cr.y=+this.value;cropDraw()"><div class="row2"><button class="btn" onclick="cropOk()">تطبيق</button><button class="btn alt" onclick="document.getElementById('dlg').hidden=true">إلغاء</button></div></div>`;d.hidden=false;const im=new Image();im.onload=()=>{cr.im=im;cropDraw()};im.src=draft.img}
+function cropDraw(n=300,c=document.getElementById("cv")){if(!cr.im||!c)return;const im=cr.im,q=Math.min(im.width,im.height)/cr.z;c.width=c.height=n;c.getContext("2d").drawImage(im,(im.width-q)*cr.x,(im.height-q)*cr.y,q,q,0,0,n,n)}
+function cropOk(){const c=document.createElement("canvas");cropDraw(520,c);draft.img=c.toDataURL("image/jpeg",.8);document.getElementById("dlg").hidden=true;render()}
+/* companion */
+const dayN=()=>Math.floor(Date.now()/864e5),greet=()=>{const h=new Date().getHours();return h<5?"سهران؟ 🌙":h<12?"صباح الخير ☀️":h<17?"مساء النور 🌤️":h<21?"مساك الله بالخير 🌆":"ليلتك سعيدة 🌙"};
+function streak(){let i=log[today()]?0:1,n=0;while(log[dstr(Date.now()-i*864e5)]){n++;i++}return n}
+function nudge(){const h=new Date().getHours(),w=log[today()],sd=dayN(),pk=a=>a[sd%a.length];let m,b=[];
+ if(w){m=h<12?pk(["ما شاء الله لبست من بدري 👌 يلا اطلع ولا تضيّع اليوم","طقمك جاهز وأنت حلو فيه، يلا اطلع!"]):h<18?pk(["طقم اليوم يجنن، وش مخططك؟ لا تقعد في البيت 😄","لابس حلو وقاعد؟ يلا طلعة ولو قهوة ☕"]):pk(["كيف كان طقم اليوم؟ جهز لبكرة وارتاح","يومك قارب يخلص، نخطط لبكرة؟"]);if(h>=18)b=[["خطة الأسبوع","tab='week';render()"]]}
+ else{m=h<6?"لسا بدري، نام زين 😴":h<10?pk(["يلا قوم وجهز طقمك، اليوم يوم حلو ☀️","صباح النشاط! وش مناسبتك اليوم؟ خلنا نجهزك"]):h<14?pk([`الساعة ${h} وما لبست؟ ليش ما تطلع؟ يلا نختار لك`,"وش تنتظر؟ اضغط ونجهز لك طقم ونطلع!"]):h<18?pk(["لا تقول لي قاعد في البيت من الصبح! يلا نطلعك 😅","لسا فيه وقت للطلعة، يلا نجهز طقم"]):h<23?pk(["الليل لسا طويل! طلعة قهوة؟ يلا نجهزك","ليش ما طلعت اليوم؟ لسا فيه وقت 😎"]):"تأخرت! جهز طقم بكرة ونام 🌙";if(h>=6&&h<23)b=[["اقترح لي طقم","tab='today';make()"]]}
+ const t0=today(),ev=events.find(e=>e.date==t0)||events.find(e=>e.date==dstr(Date.now()+864e5)),ex=[];
+ if(wx)ex.push([weather=="حار"?`العظمى اليوم ${wxT}° حار برا، ألبس خفيف واشرب مويه 💧`:weather=="بارد"?`العظمى اليوم ${wxT}° بارد، لا تنسى الجاكيت 🧥`:`العظمى اليوم ${wxT}° معتدل ومناسب للطلعة 👌`]);
+ if(new Date().getDay()==5)ex.push(["جمعة مباركة 🕌 لا تنسى ثوبك والعطر"]);
+ const st=streak();if(st>=2)ex.push([`${st} أيام متواصلة وأنت منظم 🔥`]);
+ const dm=dormant()[0];if(dm)ex.push([`«${dm.sub||CATS[dm.cat]}» بقالها ${age(dm)} يوم ما انلبست، ليش ظالمها؟`,["البسها اليوم",`useDorm(${dm.id})`]]);
+ const x=ev?[ev.date==t0?`اليوم «${esc(ev.title)}» 🎉 جهزت لك طقمه`:`بكرة «${esc(ev.title)}»، لا تنسى تجهز`,["اعرض الطقم",`evShow(${ev.id})`]]:ex.length?ex[sd%ex.length]:null;
+ return{m,b,x}}
+function nudgeHTML(){const n=nudge(),ok=items.length>=3,bs=[...n.b,...(n.x&&n.x[1]?[n.x[1]]:[])];return `<div class="card nudge"><div class="nm">${n.m}</div>${n.x?`<div class="note">${n.x[0]}</div>`:""}${ok&&bs.length?`<div class="row2">${bs.map(([t,a])=>`<button class="btn alt" onclick="${a}">${t}</button>`).join("")}</div>`:""}<button class="chip" style="margin-top:10px" onclick="remind()">⏰ ذكّرني كل يوم</button></div>`}
+function useDorm(id){const p=$i(id);if(!p)return;cur=gen(occ,new Set(),[p]);if(cur)cur.locked=new Set([id]);render()}
+function evShow(id){const e=events.find(x=>x.id==id),ps=e.ids.map($i).filter(Boolean);cur={parts:ps,sc:score(ps),miss:[],manual:true,occ:e.occ};tab="today";render()}
+function remind(){const d=document.getElementById("dlg");d.innerHTML=`<div class="dbox"><div>⏰ متى أذكّرك كل يوم؟</div><input id="rt" class="inp" type="time" value="08:00" style="margin-top:12px"><div class="note" style="margin-bottom:6px">يتحمّل ملف يُضاف لتقويم جوالك، وينبّهك كل يوم حتى لو التطبيق مقفل.</div><button class="btn" onclick="remGo()">إضافة التذكير</button><button class="btn alt" onclick="document.getElementById('dlg').hidden=true">إلغاء</button></div>`;d.hidden=false}
+function remGo(){const t=(document.getElementById("rt").value||"08:00").split(":"),n=new Date(),p=x=>String(x).padStart(2,"0"),msg="👔 يلا جهز طقمك واطلع! افتح خزانتي واختر لبسك";
+ const L=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//khizanati//AR","BEGIN:VEVENT","UID:khizanati-daily@khizanati","DTSTAMP:"+n.toISOString().replace(/[-:]/g,"").slice(0,15)+"Z","DTSTART:"+n.getFullYear()+p(n.getMonth()+1)+p(n.getDate())+"T"+p(t[0])+p(t[1])+"00","DURATION:PT15M","RRULE:FREQ=DAILY","SUMMARY:"+msg,"DESCRIPTION:"+msg,...(/^https?:/.test(location.href)?["URL:"+location.href]:[]),"BEGIN:VALARM","TRIGGER:PT0M","ACTION:DISPLAY","DESCRIPTION:"+msg,"END:VALARM","END:VEVENT","END:VCALENDAR"];
+ const C=window.Capacitor,LN=C&&C.isNativePlatform&&C.isNativePlatform()&&C.Plugins&&C.Plugins.LocalNotifications;
+ if(LN){LN.requestPermissions().then(async p=>{if(p.display!=="granted"){toast("فعّل الإشعارات من إعدادات الجوال");return}
+  try{await LN.cancel({notifications:[{id:1}]})}catch(e){}
+  await LN.schedule({notifications:[{id:1,title:"خزانتي",body:msg,schedule:{on:{hour:+t[0],minute:+t[1]},allowWhileIdle:true}}]});
+  document.getElementById("dlg").hidden=true;toast("تم تفعيل التذكير اليومي ✓")}).catch(()=>toast("ما قدرت أفعّل التذكير"));return}
+ const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([L.join("\r\n")],{type:"text/calendar"}));a.download="khizanati-reminder.ics";a.click();document.getElementById("dlg").hidden=true;toast("افتح الملف عشان يندرج في التقويم")}
+/* extras: washing, dislikes, add pieces, trip, analysis */
+let openF=new Set();function tgF(e){e.open?openF.add(e.dataset.k):openF.delete(e.dataset.k)}
+const fk=k=>`data-k="${k}" ${openF.has(k)?"open":""} ontoggle="tgF(this)"`;
+const WASH=["top","bottom","thobe"],thrOf=c=>c=="bottom"?thr*2:thr;
+function washed(id){const i=$i(id);if(!i)return;i.inw=false;i.since=0;put("items",i);render()}
+function washAll(){items.filter(i=>i.inw).forEach(i=>{i.inw=false;i.since=0;put("items",i)});toast("تمام، كلها انغسلت 🧺");render()}
+function tgDirty(id){const i=$i(id);if(!i)return;i.inw=!i.inw;if(!i.inw)i.since=0;put("items",i);render()}
+function setThr(v){thr=+v||3;try{localStorage.thr=thr}catch(e){}render()}
+function laundryHTML(){const d=items.filter(i=>i.inw),near=items.filter(i=>!i.inw&&WASH.includes(i.cat)&&(i.since||0)>0&&(i.since||0)>=thrOf(i.cat)-1).slice(0,6);
+ const tile=i=>`<div class="day"><div class="t" style="grid-template-columns:1fr"><img src="${i.img}" alt="" loading="lazy" decoding="async"></div><button class="chip" style="padding:5px 8px;font-size:12px" onclick="washed(${i.id})">✓ انغسلت</button></div>`;
+ return `<details class="card fold" ${fk("wash")}><summary>🧺 الغسيل</summary><div class="note">القطعة تدخل الغسيل بعد ${thr} لبسات (البناطيل ${thr*2}) وما أقترحها وهي فيه. وتقدر تحط أي قطعة في الغسيل بزر 🧺 عليها.</div><label>عدد اللبسات قبل الغسيل</label><select onchange="setThr(this.value)">${[1,2,3,4,5].map(n=>`<option ${n==thr?"selected":""}>${n}</option>`).join("")}</select>${d.length?`<div class="note" style="margin-top:12px">في الغسيل (${d.length})</div><div class="strip">${d.map(tile).join("")}</div><button class="btn alt" onclick="washAll()">✓ انغسلت كلها</button>`:`<div class="note" style="margin-top:10px">ما فيه قطع في الغسيل ✨</div>`}${near.length?`<div class="note" style="margin-top:10px">قاربت تحتاج غسيل: ${near.map(i=>i.sub||CATS[i.cat]).join("، ")}</div>`:""}</details>`}
+/* dislike pairs */
+function disOpen(){if(!cur)return;const ps=cur.parts,nm=p=>(p.sub||CATS[p.cat])+" "+p.color,pr=[];for(let a=0;a<ps.length;a++)for(let b=a+1;b<ps.length;b++)pr.push([ps[a],ps[b]]);if(!pr.length)return toast("الطقم قطعة وحدة بس");
+ const d=document.getElementById("dlg");d.innerHTML=`<div class="dbox" style="max-height:92vh;overflow:auto"><div>وش اللي ما عجبك؟</div><div class="note" style="margin-bottom:8px">اختر القطعتين اللي ما تنفعون مع بعض، وما أجمعهم مرة ثانية.</div><div class="chips" style="justify-content:center">${pr.map(([a,b])=>`<button class="chip" onclick="disAdd(${a.id},${b.id})">${nm(a)} + ${nm(b)}</button>`).join("")}</div><button class="btn alt" onclick="document.getElementById('dlg').hidden=true">إلغاء</button></div>`;d.hidden=false}
+function disAdd(a,b){dis.add(dk(a,b));saveDis();document.getElementById("dlg").hidden=true;toast("تمام، ما أجمعهم مرة ثانية 👎");if(cur&&!cur.manual){if(cur.locked){cur.locked.delete(a);cur.locked.delete(b)}make()}else render()}
+function disDel(k){dis.delete(k);saveDis();render()}
+function disListHTML(){const v=[...dis].map(k=>{const[a,b]=k.split("-").map(Number);return[k,$i(a),$i(b)]}).filter(x=>x[1]&&x[2]);if(!v.length)return"";
+ return `<details class="card fold" ${fk("dis")}><summary>👎 تركيبات مستبعدة (${v.length})</summary><div class="note">القطع هذي ما أجمعها مع بعض.</div>${v.map(([k,a,b])=>`<div class="wk"><div style="flex:1">${thumbs([a,b])}</div><button class="chip" onclick="disDel('${k}')">رجّعها</button></div>`).join("")}</details>`}
+/* add jacket / accessory to current outfit */
+function addOpen(){if(!cur)return;const o=cur.occ||occ,l=items.filter(i=>(i.cat=="jacket"||i.cat=="acc")&&(fits(i,o)||cur.parts.some(p=>p.id==i.id))),d=document.getElementById("dlg");
+ d.innerHTML=`<div class="dbox" style="max-height:92vh;overflow:auto"><div>أضف قطعة للطقم</div><div class="note" style="margin-bottom:8px">اضغط على القطعة تنضاف، واضغط مرة ثانية تنشال.</div>${l.length?`<div class="grid" style="grid-template-columns:repeat(3,1fr)">${l.map(i=>`<div class="piece ${cur.parts.some(p=>p.id==i.id)?"sel":""}" onclick="addTg(${i.id})"><img src="${i.img}" alt="" loading="lazy" decoding="async"><span>${i.sub||CATS[i.cat]}</span></div>`).join("")}</div>`:`<div class="note">ما عندك جاكيتات ولا إكسسوارات مناسبة، أضفها من تبويب «قطعة».</div>`}<button class="btn" onclick="document.getElementById('dlg').hidden=true">تم</button></div>`;d.hidden=false}
+function addTg(id){const p=$i(id);if(!p||!cur)return;const k=cur.parts.findIndex(x=>x.id==id);if(k>=0){cur.parts.splice(k,1);if(cur.locked)cur.locked.delete(id)}else{cur.parts.push(p);if(!cur.manual){cur.locked=cur.locked||new Set();cur.locked.add(id)}}cur.sc=score(cur.parts);render();addOpen()}
+/* travel bag */
+let trip={days:5,occs:new Set(["طلعة / سفر","عادي"]),light:true,res:null};
+function tgTO(o){trip.occs.has(o)?trip.occs.delete(o):trip.occs.add(o);trip.res=null;render()}
+function tripGo(){if(items.length<3)return toast("أضف قطع أول");const oc=OCC.filter(o=>trip.occs.has(o));if(!oc.length)return toast("اختر مناسبة وحدة على الأقل");
+ const days=Array.from({length:trip.days},(_,i)=>oc[i%oc.length]),cnt={},used=new Set(),pool={},res=[];days.forEach(o=>cnt[o]=(cnt[o]||0)+1);
+ for(const o of days){const P=pool[o]||(pool[o]={shoes:null,bots:[],n:0}),nb=Math.max(1,Math.ceil(cnt[o]/3)),fixed=[];
+  if(trip.light){if(P.shoes)fixed.push(P.shoes);if(P.bots.length>=nb)fixed.push(P.bots[P.n++%P.bots.length])}
+  const r=gen(o,used,fixed,used);if(!r){res.push({o,parts:[]});continue}
+  if(trip.light){if(!P.shoes)P.shoes=r.parts.find(p=>p.cat=="shoes")||null;const b=r.parts.find(p=>p.cat=="bottom");if(b&&!P.bots.some(x=>x.id==b.id)&&P.bots.length<nb)P.bots.push(b)}
+  r.parts.forEach(p=>used.add(p.id));res.push({o,parts:r.parts})}
+ trip.res=res;render()}
+function tripHTML(){const t=trip;let h=`<details class="card fold" ${fk("trip")}><summary>🧳 شنطة السفر</summary><label>عدد الأيام</label><select onchange="trip.days=+this.value;trip.res=null;render()">${Array.from({length:13},(_,i)=>i+2).map(n=>`<option ${n==t.days?"selected":""}>${n}</option>`).join("")}</select><label>المناسبات في السفرة</label><div class="chips">${OCC.map(o=>`<button class="chip ${t.occs.has(o)?"on":""}" onclick="tgTO('${o}')">${o}</button>`).join("")}</div><label class="note" style="display:flex;gap:8px;align-items:center;margin:8px 0"><input type="checkbox" ${t.light?"checked":""} onchange="trip.light=this.checked;trip.res=null;render()"> شنطة خفيفة (أعيد استخدام الأحذية والبناطيل)</label><button class="btn" onclick="tripGo()">جهّز الشنطة</button>`;
+ const R=t.res;if(R){const u={};R.forEach(d=>d.parts.forEach(p=>u[p.id]=(u[p.id]||0)+1));const ids=Object.keys(u).map(Number);
+  h+=`<div class="note" style="margin-top:12px">الجو: ${WEA[weather]} ${weather} · إجمالي ${ids.length} قطعة لـ ${t.days} أيام</div>`+R.map((d,i)=>`<div class="wk"><b style="width:74px">يوم ${i+1}<br><span class="note">${d.o}</span></b><div style="flex:1">${d.parts.length?thumbs(d.parts):`<span class="note">ما قدرت أركّب طقم</span>`}</div></div>`).join("")+`<h3>🎒 قائمة التحزيم</h3>`+Object.keys(CATS).map(c=>{const l=ids.map($i).filter(x=>x&&x.cat==c);return l.length?`<div class="note" style="margin:10px 0 6px">${CATS[c]} (${l.length})</div><div class="strip">${l.map(i=>`<div class="day"><div class="t" style="grid-template-columns:1fr"><img src="${i.img}" alt="" loading="lazy" decoding="async"></div><label style="display:flex;gap:4px;justify-content:center;align-items:center"><input type="checkbox">${u[i.id]}×</label></div>`).join("")}</div>`:""}).join("")}
+ return h+`</details>`}
+/* wardrobe analysis */
+function compat(){const grp={top:["bottom","shoes"],bottom:["top","shoes"],shoes:["top","bottom"],jacket:["top","bottom"]},rows=[];
+ items.forEach(i=>{const g=grp[i.cat];if(!g)return;const os=items.filter(o=>g.includes(o.cat));if(os.length<2)return;let ok=0;os.forEach(o=>{if(score([i,o])>=80)ok++});rows.push({i,f:ok/os.length,ok,n:os.length})});return rows}
+function analysisHTML(){const c=k=>items.filter(i=>i.cat==k).length,T=c("top"),B=c("bottom"),S=c("shoes"),H=c("thobe"),J=c("jacket"),g=[],neu=i=>NEU.includes(i.color);
+ let nm=0;for(const o of OCC){const n=k=>items.filter(i=>i.cat==k&&i.occ.includes(o)&&fits(i,o)).length,t=n("top"),b=n("bottom"),h=n("thobe"),s=n("shoes"),m=[];if(!h){if(!t)m.push("قميص أو تيشيرت");if(!b)m.push("بنطلون")}if(!s)m.push("حذاء");if(m.length&&nm++<3)g.push(`ما عندك ${m.join(" ولا ")} يناسب «${o}»`)}
+ const tot=OCC.filter(o=>{const n=k=>items.filter(i=>i.cat==k&&i.occ.includes(o)&&fits(i,o)).length;return(!n("thobe")&&(!n("top")||!n("bottom")))||!n("shoes")}).length;if(tot>3)g.push(`وفيه ${tot-3} مناسبات ثانية ناقصها قطع، أضف قطع جديدة أو عدّل مناسبات قطعك`);
+ if(T&&B&&Math.max(T,B)>=3*Math.min(T,B)&&Math.min(T,B)<=3)g.push(`عندك ${T} تيشيرتات وقمصان و${B} بناطيل، زيادة ${T>B?"بنطلون":"قميص"} تضاعف تركيباتك`);
+ if(!S&&items.length>=3)g.push("ما عندك أي حذاء");
+ if(items.length>=5&&!J&&!items.some(i=>["سويتر","هودي","معطف","بشت"].includes(i.sub)))g.push("ما عندك شي للبرد (جاكيت أو سويتر)");
+ if(items.length>=5&&items.filter(i=>["top","bottom","thobe"].includes(i.cat)&&(i.season||"all")!="cold"&&!HOT_NO.includes(i.sub)).length<3)g.push("قطعك الخفيفة قليلة للجو الحار");
+ if(B&&!items.some(i=>i.cat=="bottom"&&neu(i)))g.push("بناطيلك كلها ألوان قوية، أضف بنطلون أسود أو كحلي أو بيج يركب مع كل شي");
+ if(T>=3&&items.filter(i=>i.cat=="top"&&!neu(i)).length>T*.6)g.push("أغلب قمصانك ألوان قوية، أضف أساسيات (أبيض أو أسود أو كحلي) تسهّل التنسيق");
+ if(items.length>=6&&items.every(neu))g.push("كل قطعك ألوان محايدة، لو تبي لمسة لون أضف قطعة زيتي أو أزرق");
+ const combos=(T*B+H)*Math.max(S,1);
+ let h=`<details class="card fold" ${fk("gap")}><summary>🔍 وش ينقصك</summary>${combos?`<div class="note">تركيبات ممكنة تقريباً: ${combos}</div>`:""}${g.length?g.map(x=>`<div class="note" style="margin-top:8px">• ${x}</div>`).join(""):`<div class="note" style="margin-top:8px">خزانتك متوازنة 👌</div>`}</details>`;
+ const rows=compat();if(rows.length>=4){const st=l=>`<div class="strip">${l.map(r=>`<div class="day" onclick="edit(${r.i.id})"><div class="t" style="grid-template-columns:1fr"><img src="${r.i.img}" alt="" loading="lazy" decoding="async"></div>${Math.round(r.f*100)}%</div>`).join("")}</div>`,
+  best=[...rows].filter(r=>r.f>=.7).sort((a,b)=>b.f-a.f||b.n-a.n).slice(0,5),worst=[...rows].filter(r=>r.f<=.4).sort((a,b)=>a.f-b.f).slice(0,5);
+  if(best.length||worst.length)h+=`<details class="card fold" ${fk("cmp")}><summary>🎯 تنسيق قطعك</summary>${best.length?`<div class="note" style="margin-top:8px">أكثر قطع تركب مع غيرها</div>`+st(best):""}${worst.length?`<div class="note" style="margin-top:8px">قطع صعب تتنسق (نسبة التركيبات الحلوة)</div>`+st(worst):""}</details>`}
+ return h}
+async function saveFile(name,data){
+ const C=window.Capacitor;
+ if(C&&C.isNativePlatform&&C.isNativePlatform()&&C.Plugins&&C.Plugins.Filesystem&&C.Plugins.Share){
+  try{
+   const b64=await new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(String(fr.result).split(",")[1]);fr.onerror=rej;fr.readAsDataURL(data instanceof Blob?data:new Blob([data]))});
+   const r=await C.Plugins.Filesystem.writeFile({path:name,data:b64,directory:"CACHE"});
+   await C.Plugins.Share.share({title:name,url:r.uri});return
+  }catch(e){if(e&&/cancel/i.test(String(e.message||e)))return}
+ }
+ const a=document.createElement("a");a.href=URL.createObjectURL(data instanceof Blob?data:new Blob([data]));a.download=name;a.click()}
+/* backup */
+function exp(){saveFile("khizanati-backup-"+today()+".json",JSON.stringify({v:1,items,outfits,log,events,dis:[...dis]}));try{localStorage.lb=Date.now()}catch(e){}toast("انحفظت النسخة ✓")}
+async function imp(el){const f=el.files[0];el.value="";if(!f)return;try{const d=JSON.parse(await f.text()),A=x=>Array.isArray(x)?x:[],up=(a,st,l)=>l.forEach(v=>{const i=a.findIndex(x=>x.id==v.id);i>=0?a[i]=v:a.push(v);put(st,v)}),ok=(a,l)=>A(a).filter(x=>l.includes(x));
+ up(items,"items",A(d.items).filter(i=>i&&CATS[i.cat]&&/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(i.img)).map(i=>{const cl=ok(i.colors,COLORS);return{id:+i.id,img:i.img,cat:i.cat,sub:SUBS[i.cat].includes(i.sub)?i.sub:"",colors:cl.length?cl:["أسود"],color:cl[0]||"أسود",occ:ok(i.occ,OCC).length?ok(i.occ,OCC):["عادي"],season:SEAS[i.season]?i.season:"all",last:+i.last||0,count:+i.count||0,since:+i.since||0,inw:!!i.inw}}));
+ up(outfits,"outfits",A(d.outfits).filter(o=>o&&A(o.ids).length).map(o=>({id:+o.id,ids:o.ids.map(Number),occ:OCC.includes(o.occ)?o.occ:"",name:String(o.name||"").slice(0,40)})));
+ up(events,"events",A(d.events).filter(e=>e&&/^\d{4}-\d\d-\d\d$/.test(e.date)&&A(e.ids).length).map(e=>({id:+e.id,date:e.date,title:String(e.title||"").slice(0,60),occ:OCC.includes(e.occ)?e.occ:"عادي",ids:e.ids.map(Number)})));
+ A(d.dis).forEach(k=>{if(/^\d+-\d+$/.test(k))dis.add(k)});saveDis();Object.entries(d.log||{}).forEach(([k,v])=>{if(/^\d{4}-\d\d-\d\d$/.test(k)&&Array.isArray(v)){log[k]=v.map(Number);put("log",{d:k,ids:log[k]})}});toast("تم الاستيراد ✓");render()}catch(e){toast("الملف غير صالح")}}
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{if(tab=="add"&&b.dataset.t!="add"){editId=null;draft=newDraft()}tab=b.dataset.t;render()});
+
+(()=>{const lb=document.createElement("div");lb.id="lb";lb.hidden=true;lb.innerHTML='<button aria-label="إغلاق">✕</button><div id="lbc"></div>';document.body.appendChild(lb);
+const open=h=>{document.getElementById("lbc").innerHTML=h;lb.hidden=false},close=()=>{lb.hidden=true};lb.onclick=close;let tm=0,fired=0;
+document.addEventListener("pointerdown",e=>{const im=e.target.closest(".piece img");if(!im)return;tm=setTimeout(()=>{fired=1;open(`<img src="${im.src}" alt="">`)},450)});
+["pointerup","pointermove","pointercancel"].forEach(t=>document.addEventListener(t,()=>clearTimeout(tm)));
+document.addEventListener("click",e=>{if(fired){fired=0;e.stopPropagation();e.preventDefault();return}const b=e.target.closest(".board");if(b&&!e.target.closest("#lb")&&!e.target.closest("button"))open(`<div class="board" style="width:min(92vw,440px);max-width:none;cursor:default">${b.innerHTML}</div>`)},true);
+document.addEventListener("keydown",e=>{if(e.key=="Escape")close()})})();
+document.getElementById("dlg").onclick=e=>{if(e.target.id=="dlg")e.target.hidden=true};
+(async()=>{await openDB();dbDone=true;items=await all("items");items.filter(i=>i.demo).forEach(i=>del("items",i.id));items=items.filter(i=>!i.demo);items.forEach(i=>{if(i.orig){i.img=i.orig;delete i.orig;delete i.opts;put("items",i)}});outfits=(await all("outfits")).sort((a,b)=>b.id-a.id);(await all("log")).forEach(l=>log[l.d]=l.ids);events=await all("events");if(items.length){outfits=outfits.filter(f=>{if(f.ids.some($i))return true;del("outfits",f.id);return false});events=events.filter(e=>{if(e.ids.some($i))return true;del("events",e.id);return false})}render();try{if(localStorage.aw=="1"&&localStorage.awc){const c=localStorage.awc.split(",");getW(+c[0],+c[1],1)}}catch(e){}})();
+</script>
+</body>
+</html>
