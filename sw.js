@@ -1,6 +1,6 @@
 /* خزانتي — Service Worker: يخلّي التطبيق يفتح بدون إنترنت.
    غيّر رقم VERSION عند كل تحديث للملفات عشان تتحدّث النسخة المخزّنة. */
-const VERSION = "v1";
+const VERSION = "v2";
 const SHELL = `khizanati-shell-${VERSION}`;
 const RUNTIME = `khizanati-runtime-${VERSION}`;
 const SHELL_FILES = [

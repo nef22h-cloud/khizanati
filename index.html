@@ -179,6 +179,26 @@ function del(s,k){try{if(db)db.transaction(s,"readwrite").objectStore(s).delete(
 function shrink(file){return new Promise(res=>{const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const m=720,s=Math.min(1,m/Math.max(im.width,im.height));const c=document.createElement("canvas");c.width=im.width*s;c.height=im.height*s;c.getContext("2d").drawImage(im,0,0,c.width,c.height);res(c.toDataURL("image/jpeg",.78))};im.src=fr.result};fr.readAsDataURL(file)})}
 function blobOf(d){const b=atob(d.split(",")[1]);const u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return new Blob([u],{type:"image/jpeg"})}
 let sample=null;
+/* AI via the Cloudflare Worker proxy (worker/). Settings live only on this device. */
+let aiCfg={url:"",code:""};try{aiCfg=Object.assign(aiCfg,JSON.parse(localStorage.ai||"{}"))}catch(e){}
+const b64=b=>new Promise((r,j)=>{const f=new FileReader();f.onload=()=>r(f.result);f.onerror=j;f.readAsDataURL(b)});
+function aiReq(path,body){return fetch(aiCfg.url.replace(/\/+$/,"")+path,{method:"POST",headers:{"content-type":"application/json","x-app-passcode":aiCfg.code},body:JSON.stringify(body||{})})}
+let aiWarned=0;async function aiErr(res){let c="http_"+res.status;try{c=(await res.json()).error||c}catch(e){}const x=new Error(c);x.code=c;
+ if(c=="unauthorized"&&!aiWarned++)toast("رمز الذكاء الاصطناعي غلط، عدّله من «خزانتي» ← الذكاء الاصطناعي");return x}
+function mkSample(){if(!aiCfg.url||!aiCfg.code)return null;
+ const s=async(prompt,o={})=>{const res=await aiReq("/stylist",{prompt,images:await Promise.all((o.images||[]).map(b64))});if(!res.ok)throw await aiErr(res);
+  const rd=res.body.getReader(),dec=new TextDecoder();let text="";for(;;){const{done,value}=await rd.read();if(done)break;text+=dec.decode(value,{stream:true});if(o.onText)o.onText({text})}return{text}};
+ s.json=async(prompt,o={})=>{const res=await aiReq("/tag",{prompt,images:await Promise.all((o.images||[]).map(b64))});if(!res.ok)throw await aiErr(res);return(await res.json()).data};
+ return s}
+sample=mkSample();
+function aiSetHTML(){const on=!!sample;return `<details class="card fold" ${fk("ai")}><summary>✨ الذكاء الاصطناعي ${on?"(مفعّل)":""}</summary><div class="note">يحدد نوع القطعة ولونها وموسمها من الصورة، ويعطيك «رأي المصمم» في الطقم. يحتاج رابط الوسيط ورمز الدخول (موجودة عند صاحب التطبيق).</div><label for="aiu">رابط الوسيط</label><input id="aiu" class="inp" type="url" dir="ltr" inputmode="url" placeholder="https://khizanati-ai.xxx.workers.dev" value="${aiCfg.url.replace(/"/g,"&quot;")}"><label for="aic">رمز الدخول</label><input id="aic" class="inp" type="password" dir="ltr" autocomplete="off" value="${aiCfg.code.replace(/"/g,"&quot;")}"><button class="btn" onclick="aiSave()">حفظ وتجربة</button>${on?`<button class="btn red" onclick="aiOff()">إيقاف الذكاء الاصطناعي</button>`:""}</details>`}
+async function aiSave(){const u=document.getElementById("aiu").value.trim(),c=document.getElementById("aic").value.trim();
+ if(!/^https:\/\/[^\s/]+/.test(u)||!c)return toast("اكتب رابط يبدأ بـ https:// ورمز الدخول");
+ const old=aiCfg;aiCfg={url:u,code:c};toast("جاري التجربة...");let ok=false,msg="ما قدرت أوصل للوسيط، تأكد من الرابط";
+ try{const r=await aiReq("/ping");if(r.ok)ok=true;else msg=r.status==401?"رمز الدخول غلط":r.status==403?"الوسيط ما يسمح لهذا الموقع":"الوسيط رد بخطأ ("+r.status+")"}catch(e){}
+ if(!ok){aiCfg=old;return toast(msg)}
+ try{localStorage.ai=JSON.stringify(aiCfg)}catch(e){}aiWarned=0;sample=mkSample();toast("تم تفعيل الذكاء الاصطناعي ✨");render()}
+function aiOff(){aiCfg={url:"",code:""};try{localStorage.removeItem("ai")}catch(e){}sample=null;toast("تم إيقاف الذكاء الاصطناعي");render()}
 
 async function aiTag1(img){if(!sample)return null;
  try{const r=await sample.json('This is a photo of ONE clothing item. Return ONLY JSON: {"cat": one of ["top","bottom","thobe","jacket","shoes","acc"] (acc = accessory such as watch, glasses, cap, belt, bag, chain), "sub": the best matching type for that cat chosen from this map '+JSON.stringify(SUBS)+', "colors": array of ALL clearly visible colors of the item (1 to 4, the dominant color first, include prints, stripes, logos and trims if clearly visible), each chosen from '+JSON.stringify(COLORS)+', "occ": array chosen from '+JSON.stringify(OCC)+' where it suits (casual items: عادي and كوفي; smart items: مطعم, دوام, رسمي; sportswear: رياضة; thobes suit most daily occasions), "season": "hot" for light, thin, breathable summer items (shorts, sleeveless, thin cotton or linen, sandals, light thobe), "cold" for thick, warm winter items (wool, fleece, hoodies, sweaters, heavy long sleeves, coats, jackets, boots, scarves, gloves, winter thobe), and "all" ONLY if it truly suits every season (for example plain jeans, sneakers, belts, watches). Do not answer "all" by default}',{images:[blobOf(img)],modelTier:"quick"});
@@ -305,7 +325,7 @@ function viewWeek(){if(!plan)initPlan();
  if(items.length<3)return h+`<div class="empty">أضف قطع أول</div>`;
  return h+`<button class="btn" onclick="planAll()">خطّط لي الأسبوع</button>`+evView()+tripHTML()}
 function viewCloset(){let h="";
- const bk=`<details class="card fold" ${fk("bk")}><summary>💾 نسخة احتياطية</summary><div class="note">صدّر خزانتك كملف تحتفظ فيه، واستورده في أي جوال أو متصفح.</div><div class="row2"><button class="btn alt" onclick="exp()">⬇️ تصدير</button><label class="btn alt" for="imp" style="text-align:center;margin:10px 0 0">⬆️ استيراد</label></div><input id="imp" type="file" accept=".json,application/json" hidden onchange="imp(this)"></details>`;
+ const bk=`<details class="card fold" ${fk("bk")}><summary>💾 نسخة احتياطية</summary><div class="note">صدّر خزانتك كملف تحتفظ فيه، واستورده في أي جوال أو متصفح.</div><div class="row2"><button class="btn alt" onclick="exp()">⬇️ تصدير</button><label class="btn alt" for="imp" style="text-align:center;margin:10px 0 0">⬆️ استيراد</label></div><input id="imp" type="file" accept=".json,application/json" hidden onchange="imp(this)"></details>`+aiSetHTML();
  if(outfits.length){h+=`<h1>طقومي المحفوظة</h1><div class="chips">${["all",...OCC].map(o=>`<button class="chip ${fo==o?"on":""}" onclick="fo='${o}';render()">${o=="all"?"الكل":o}</button>`).join("")}</div>`+outfits.filter(f=>fo=="all"||f.occ==fo).map(f=>{const ps=f.ids.map($i).filter(Boolean);if(!ps.length)return "";return `<div class="card"><b>${esc(f.name||"طقم بدون اسم")}</b><div class="note">${f.occ||""}</div>${board(ps)}<div class="row2"><button class="btn alt" onclick="useFav(${f.id})">اعرضه</button><button class="btn alt" onclick="editFav(${f.id})">عدّل</button><button class="btn alt" onclick="renFav(${f.id})">✏️ اسم</button></div><div class="row2"><button class="btn alt" onclick="shareFav(${f.id})">📤 شارك</button><button class="btn red" onclick="rmFav(${f.id})">حذف</button></div></div>`}).join("")}
  if(!items.length)return h+`<h1>خزانتي</h1><div class="card empty">ما أضفت شي للحين</div>`+bk;
  h+=insights();if(items.length>=3){const top=[...items].filter(i=>i.count).sort((a,b)=>b.count-a.count).slice(0,4),dm=dormant().slice(0,6);const st=(l,f)=>`<div class="strip">${l.map(i=>`<div class="day" onclick="edit(${i.id})"><div class="t" style="grid-template-columns:1fr"><img src="${i.img}" alt="" loading="lazy" decoding="async"></div>${f(i)}</div>`).join("")}</div>`;
@@ -366,7 +386,7 @@ function rmFav(id){outfits=outfits.filter(f=>f.id!=id);del("outfits",id);render(
 function useFav(id){const f=outfits.find(x=>x.id==id);const ps=f.ids.map($i).filter(Boolean);cur={parts:ps,sc:score(ps),miss:[],manual:true,occ:f.occ};tab="today";render()}
 async function ask(){if(!cur||!sample)return;const el=document.getElementById("ai");el.hidden=false;el.textContent="المصمم يفكر...";
  try{const r=await sample("الصور هي قطع طقم واحد لشخص رايح: "+(cur.occ||occ)+"، والجو: "+weather+". أنت مصمم أزياء بذوق عالي. علّق بلهجة سعودية خفيفة وودودة في ٣ جمل كحد أقصى: هل الطقم يناسب المناسبة؟ وش الحلو فيه؟ وتعديل بسيط واحد إذا فيه (مثلاً قطعة أو إكسسوار).",{images:cur.parts.map(p=>blobOf(p.img)),onText:({text})=>{el.textContent=text}});cur.ai=r.text}
- catch(e){el.textContent=e.code=="not_granted"?"ما سمحت للتطبيق.":"ما قدرت أجيب رأي المصمم الحين، جرب بعدين.";}}
+ catch(e){el.textContent=e.code=="not_granted"?"ما سمحت للتطبيق.":e.code=="unauthorized"?"رمز الذكاء الاصطناعي غلط، عدّله من الإعدادات.":e.code=="rate_limited"?"طلبات كثيرة، جرب بعد دقيقة.":"ما قدرت أجيب رأي المصمم الحين، جرب بعدين.";}}
 let sty=[],stf="all";
 const styParts=()=>sty.map($i).filter(Boolean);
 function tgS(id){const i=sty.indexOf(id);i>=0?sty.splice(i,1):sty.push(id);render()}
