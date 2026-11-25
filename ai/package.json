@@ -1,0 +1,8 @@
+{
+  "name": "khizanati-ai-labels",
+  "private": true,
+  "type": "module",
+  "description": "Builds ai/labels.json (precomputed text embeddings for on-device clothing recognition)",
+  "scripts": { "build": "node build.mjs" },
+  "devDependencies": { "@huggingface/transformers": "4.3.2" }
+}

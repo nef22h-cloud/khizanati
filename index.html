@@ -185,20 +185,44 @@ const b64=b=>new Promise((r,j)=>{const f=new FileReader();f.onload=()=>r(f.resul
 function aiReq(path,body){return fetch(aiCfg.url.replace(/\/+$/,"")+path,{method:"POST",headers:{"content-type":"application/json","x-app-passcode":aiCfg.code},body:JSON.stringify(body||{})})}
 let aiWarned=0;async function aiErr(res){let c="http_"+res.status;try{c=(await res.json()).error||c}catch(e){}const x=new Error(c);x.code=c;
  if(c=="unauthorized"&&!aiWarned++)toast("رمز الذكاء الاصطناعي غلط، عدّله من «خزانتي» ← الذكاء الاصطناعي");return x}
-function mkSample(){if(!aiCfg.url||!aiCfg.code)return null;
+/* On-device AI (free): Marqo-FashionSigLIP vision model via Transformers.js; label vectors precomputed in ai/labels.json */
+const LAI={lib:"https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.3.2",model:"Marqo/marqo-fashionSigLIP",dtype:"bnb4",mb:55};
+let aiLocal=false;try{aiLocal=localStorage.aiLocal=="1"}catch(e){}
+let laiP=null;
+function loadLocal(onP){if(!laiP)laiP=(async()=>{const T=await import(LAI.lib);T.env.allowLocalModels=false;
+  const lj=await (await fetch("ai/labels.json")).json();const raw=Uint8Array.from(atob(lj.data),c=>c.charCodeAt(0)),D=lj.dim;
+  const vec=lj.labels.map((_,i)=>{const v=new Float32Array(D);for(let j=0;j<D;j++){const b=raw[i*D+j];v[j]=(b>127?b-256:b)*lj.scales[i]}return v});
+  const files={};const pc=p=>{if(p.status=="progress"&&p.total){files[p.file]=[p.loaded,p.total];let a=0,b=0;for(const k in files){a+=files[k][0];b+=files[k][1]}if(onP)onP(Math.min(99,Math.round(100*a/Math.max(b,LAI.mb*1e6))))}};
+  const proc=await T.AutoProcessor.from_pretrained(LAI.model,{progress_callback:pc});
+  const vm=await T.SiglipVisionModel.from_pretrained(LAI.model,{dtype:LAI.dtype,device:"wasm",progress_callback:pc});
+  return{T,proc,vm,vec,labels:lj.labels}})().catch(e=>{laiP=null;throw e});return laiP}
+const OCC_DEF=sub=>["تيشيرت رياضي","جوجر / رياضي","جاكيت رياضي","رياضي"].includes(sub)?["رياضة","عادي"]:["بنطلون رسمي","بليزر","رسمي / كلاسيك","كرفتة / ببيون","بشت","ثوب رسمي"].includes(sub)?["رسمي","دوام","مطعم"]:["قميص","شينو","بنطلون قماش","موكاسين","ساعة"].includes(sub)?["دوام","مطعم","كوفي","عادي"]:/^ثوب/.test(sub)?["عادي","كوفي","مطعم","دوام"]:["عادي","كوفي"];
+async function localTag(img){const L=await loadLocal(),a=await analyze(img)||{};
+ const {image_embeds}=await L.vm(await L.proc(await L.T.RawImage.fromURL(img)));const v=image_embeds.data;let n=0;for(let j=0;j<v.length;j++)n+=v[j]*v[j];n=Math.sqrt(n)||1;
+ let bi=0,bs=-1e9;L.vec.forEach((e,i)=>{let s=0;for(let j=0;j<e.length;j++)s+=v[j]*e[j];if(s>bs){bs=s;bi=i}});
+ let [cat,sub]=L.labels[bi];const colors=(a.colors&&a.colors.length?a.colors:["أسود"]).slice(0,4);
+ if(cat=="thobe")sub=["أبيض","بيج"].includes(colors[0])?"ثوب صيفي":"ثوب شتوي";
+ return{cat,sub,colors,color:colors[0],occ:OCC_DEF(sub),season:seasonRule(sub)}}
+function mkSample(){if(!aiCfg.url||!aiCfg.code){if(!aiLocal)return null;const s=async()=>{throw Object.assign(new Error("local"),{code:"local"})};s.local=true;s.json=async()=>null;return s}
  const s=async(prompt,o={})=>{const res=await aiReq("/stylist",{prompt,images:await Promise.all((o.images||[]).map(b64))});if(!res.ok)throw await aiErr(res);
   const rd=res.body.getReader(),dec=new TextDecoder();let text="";for(;;){const{done,value}=await rd.read();if(done)break;text+=dec.decode(value,{stream:true});if(o.onText)o.onText({text})}return{text}};
  s.json=async(prompt,o={})=>{const res=await aiReq("/tag",{prompt,images:await Promise.all((o.images||[]).map(b64))});if(!res.ok)throw await aiErr(res);return(await res.json()).data};
  return s}
 sample=mkSample();
-function aiSetHTML(){const on=!!sample;return `<details class="card fold" ${fk("ai")}><summary>✨ الذكاء الاصطناعي ${on?"(مفعّل)":""}</summary><div class="note">يحدد نوع القطعة ولونها وموسمها من الصورة، ويعطيك «رأي المصمم» في الطقم. يحتاج رابط الوسيط ورمز الدخول (موجودة عند صاحب التطبيق).</div><label for="aiu">رابط الوسيط</label><input id="aiu" class="inp" type="url" dir="ltr" inputmode="url" placeholder="https://khizanati-ai.xxx.workers.dev" value="${aiCfg.url.replace(/"/g,"&quot;")}"><label for="aic">رمز الدخول</label><input id="aic" class="inp" type="password" dir="ltr" autocomplete="off" value="${aiCfg.code.replace(/"/g,"&quot;")}"><button class="btn" onclick="aiSave()">حفظ وتجربة</button>${on?`<button class="btn red" onclick="aiOff()">إيقاف الذكاء الاصطناعي</button>`:""}</details>`}
+function aiSetHTML(){const cl=!!(aiCfg.url&&aiCfg.code),lbl=cl?"(Claude)":aiLocal?"(مفعّل)":"";
+ return `<details class="card fold" ${fk("ai")}><summary>✨ الذكاء الاصطناعي ${lbl}</summary><div class="note">يتعرف على نوع القطعة من الصورة (تيشيرت، جينز، حذاء...) ويحدد لونها وموسمها ومناسباتها تلقائيًا. مجاني، والصور ما تطلع من جوالك.</div>${aiLocal?`<div class="note">✅ مفعّل على هذا الجهاز ويشتغل حتى بدون إنترنت.</div><div><button class="btn red" onclick="aiLocalOff()">إيقاف وحذف النموذج من الجهاز</button></div>`:`<div class="note">يحتاج تحميل مرة وحدة تقريبًا ${LAI.mb} ميجا (يفضّل على واي فاي).</div><div><button class="btn" id="aiLocalBtn" onclick="aiLocalOn()">تفعيل مجاني على الجهاز</button></div>`}<details style="margin-top:14px"><summary class="note" style="cursor:pointer">خيار متقدم: Claude عبر وسيط (مدفوع) ${cl?"✓":""}</summary><div class="note">أدق، ويضيف «رأي المصمم». يحتاج وسيط على Cloudflare ومفتاح Claude (شوف worker/README.md).</div><label for="aiu">رابط الوسيط</label><input id="aiu" class="inp" type="url" dir="ltr" inputmode="url" placeholder="https://khizanati-ai.xxx.workers.dev" value="${aiCfg.url.replace(/"/g,"&quot;")}"><label for="aic">رمز الدخول</label><input id="aic" class="inp" type="password" dir="ltr" autocomplete="off" value="${aiCfg.code.replace(/"/g,"&quot;")}"><button class="btn alt" onclick="aiSave()">حفظ وتجربة</button>${cl?`<button class="btn red" onclick="aiOff()">إيقاف Claude</button>`:""}</details></details>`}
+async function aiLocalOn(){const b=document.getElementById("aiLocalBtn");if(b)b.disabled=true;let last=-1;
+ try{await loadLocal(p=>{if(p!=last){last=p;const t=`جاري تحميل الذكاء الاصطناعي ${p}%`;if(b)b.textContent=t;toast(t)}});
+  aiLocal=true;try{localStorage.aiLocal="1"}catch(e){}sample=mkSample();toast("تم تفعيل الذكاء الاصطناعي ✨");render()}
+ catch(e){console.warn(e);if(b){b.disabled=false;b.textContent="تفعيل مجاني على الجهاز"}toast("ما قدرت أحمّل النموذج، تأكد من الإنترنت وجرب مرة ثانية")}}
+async function aiLocalOff(){aiLocal=false;laiP=null;try{localStorage.removeItem("aiLocal")}catch(e){}try{await caches.delete("transformers-cache")}catch(e){}sample=mkSample();toast("تم إيقاف الذكاء الاصطناعي");render()}
 async function aiSave(){const u=document.getElementById("aiu").value.trim(),c=document.getElementById("aic").value.trim();
  if(!/^https:\/\/[^\s/]+/.test(u)||!c)return toast("اكتب رابط يبدأ بـ https:// ورمز الدخول");
  const old=aiCfg;aiCfg={url:u,code:c};toast("جاري التجربة...");let ok=false,msg="ما قدرت أوصل للوسيط، تأكد من الرابط";
  try{const r=await aiReq("/ping");if(r.ok)ok=true;else msg=r.status==401?"رمز الدخول غلط":r.status==403?"الوسيط ما يسمح لهذا الموقع":"الوسيط رد بخطأ ("+r.status+")"}catch(e){}
  if(!ok){aiCfg=old;return toast(msg)}
  try{localStorage.ai=JSON.stringify(aiCfg)}catch(e){}aiWarned=0;sample=mkSample();toast("تم تفعيل الذكاء الاصطناعي ✨");render()}
-function aiOff(){aiCfg={url:"",code:""};try{localStorage.removeItem("ai")}catch(e){}sample=null;toast("تم إيقاف الذكاء الاصطناعي");render()}
+function aiOff(){aiCfg={url:"",code:""};try{localStorage.removeItem("ai")}catch(e){}sample=mkSample();toast("تم إيقاف Claude");render()}
 
 async function aiTag1(img){if(!sample)return null;
  try{const r=await sample.json('This is a photo of ONE clothing item. Return ONLY JSON: {"cat": one of ["top","bottom","thobe","jacket","shoes","acc"] (acc = accessory such as watch, glasses, cap, belt, bag, chain), "sub": the best matching type for that cat chosen from this map '+JSON.stringify(SUBS)+', "colors": array of ALL clearly visible colors of the item (1 to 4, the dominant color first, include prints, stripes, logos and trims if clearly visible), each chosen from '+JSON.stringify(COLORS)+', "occ": array chosen from '+JSON.stringify(OCC)+' where it suits (casual items: عادي and كوفي; smart items: مطعم, دوام, رسمي; sportswear: رياضة; thobes suit most daily occasions), "season": "hot" for light, thin, breathable summer items (shorts, sleeveless, thin cotton or linen, sandals, light thobe), "cold" for thick, warm winter items (wool, fleece, hoodies, sweaters, heavy long sleeves, coats, jackets, boots, scarves, gloves, winter thobe), and "all" ONLY if it truly suits every season (for example plain jeans, sneakers, belts, watches). Do not answer "all" by default}',{images:[blobOf(img)],modelTier:"quick"});
@@ -209,7 +233,7 @@ function matchSub(cat,sub){if(!sub)return null;const n=x=>String(x).trim().toLow
  if(SYN[q])for(const c of order)if(SUBS[c].includes(SYN[q]))return{cat:c,sub:SYN[q]};
  if(q.length>2)for(const c of order){const f=SUBS[c].find(x=>{const y=n(x);return y.length>2&&(q.includes(y)||y.includes(q))});if(f)return{cat:c,sub:f}}
  return null}
-async function aiTag(img){if(!sample)return null;let t=await aiTag1(img);if(!t)t=await aiTag1(img);
+async function aiTag(img){if(!sample)return null;if(sample.local)return localTag(img).catch(e=>{console.warn(e);return null});let t=await aiTag1(img);if(!t)t=await aiTag1(img);
  if(t&&!t.sub){try{const r=await sample.json('What exactly is this clothing item or accessory? Return ONLY JSON {"cat": one of '+JSON.stringify(Object.keys(CATS))+', "sub": one string copied exactly from this map for that cat: '+JSON.stringify(SUBS)+'}. You MUST choose the closest option even if unsure.',{images:[blobOf(img)],modelTier:"quick"});const m=matchSub(r.cat,r.sub);if(m){t.cat=m.cat;t.sub=m.sub}else if(CATS[r.cat])t.cat=r.cat}catch(e){}}
  if(t&&t.sub&&(t.season||"all")=="all"){const sr=seasonRule(t.sub);if(sr!="all")t.season=sr}
  return t}
@@ -312,7 +336,7 @@ function viewToday(){if(man)return viewMan();
   if(cur.dirty&&cur.dirty.length)h+=`<div class="note">🧺 «${[...new Set(cur.dirty)].join("، ")}» في الغسيل وما لقيت بديل.</div>`;
   if(cur.miss&&cur.miss.length)h+=`<div class="note">ينقصك: ${cur.miss.join("، ")}</div>`;
   h+=`<div id="ai" class="ai" ${cur.ai?"":"hidden"}>${esc(cur.ai||"")}</div>`;
-  h+=`<button class="btn" onclick="wear()">ألبسه اليوم ✓</button><div class="row2"><button class="btn alt" onclick="${cur.manual?"cur=null;render()":"make()"}">${cur.manual?"رجوع":"غيّر الطقم"}</button><button class="btn alt" onclick="fav()">♡ احفظه</button></div><div class="chips" style="justify-content:center;margin-top:16px"><button class="chip" onclick="addOpen()">➕ إكسسوار أو جاكيت</button><button class="chip" onclick="disOpen()">👎 ما عجبني</button><button class="chip" onclick="shareImg(cur.parts.map(p=>p.id),'طقمي')">📤 شارك</button>${sample?`<button class="chip" onclick="ask()">🧥 رأي المصمم</button>`:""}</div></div>`}
+  h+=`<button class="btn" onclick="wear()">ألبسه اليوم ✓</button><div class="row2"><button class="btn alt" onclick="${cur.manual?"cur=null;render()":"make()"}">${cur.manual?"رجوع":"غيّر الطقم"}</button><button class="btn alt" onclick="fav()">♡ احفظه</button></div><div class="chips" style="justify-content:center;margin-top:16px"><button class="chip" onclick="addOpen()">➕ إكسسوار أو جاكيت</button><button class="chip" onclick="disOpen()">👎 ما عجبني</button><button class="chip" onclick="shareImg(cur.parts.map(p=>p.id),'طقمي')">📤 شارك</button>${sample&&!sample.local?`<button class="chip" onclick="ask()">🧥 رأي المصمم</button>`:""}</div></div>`}
  else{const sv=log[today()];if(sv){const ps=sv.map($i).filter(Boolean);if(ps.length)h+=`<div class="card"><b>لبسك اليوم ✓</b>${board(ps)}${uw&&uw.d==today()?`<button class="btn alt" onclick="undoWear()">↩️ تراجع / غيّر طقم اليوم</button>`:""}</div>`}
   h+=`<button class="btn" onclick="make()">اقترح لي طقم</button><button class="btn alt" onclick="man=new Set();render()">أنا اخترت طقمي، قيّمه لي</button>`}
  const days=[];for(let i=1;i<=7;i++){const d=dstr(Date.now()-i*864e5);if(log[d])days.push(d)}
@@ -392,7 +416,7 @@ const styParts=()=>sty.map($i).filter(Boolean);
 function tgS(id){const i=sty.indexOf(id);i>=0?sty.splice(i,1):sty.push(id);render()}
 function viewStyle(){const ps=styParts();
  let h=`<h1>تنسيق</h1><div class="sub">اختر القطع وركّب طقمك بنفسك، وتنعرض صورتين جنب بعض</div><div class="chips">${OCC.map(o=>`<button class="chip ${o==occ?"on":""}" onclick="occ='${o}';render()">${o}</button>`).join("")}</div>`;
- if(ps.length){const sc=score(ps);h+=`<div class="card">${board(ps)}<div class="chips" style="justify-content:center">${ps.map(p=>`<button class="chip" onclick="tgS(${p.id})">✕ ${p.sub||CATS[p.cat]}</button>`).join("")}</div><div class="score">التقييم: <b>${sc}%</b></div><div class="bar"><i style="width:${sc}%"></i></div><div>${verdict(sc)}</div>${sample?`<button class="btn alt" onclick="styAsk()">🧥 رأي المصمم</button>`:""}<div class="row2"><button class="btn alt" onclick="styFav()">${stEdit?"💾 حدّث الطقم":"♡ احفظ الطقم"}</button><button class="btn alt" onclick="sty=[];stEdit=null;render()">مسح</button></div><button class="btn alt" onclick="shareImg(sty,'طقمي')">📤 شارك الطقم</button><button class="btn" onclick="styWear()">ألبسه اليوم ✓</button></div>`}
+ if(ps.length){const sc=score(ps);h+=`<div class="card">${board(ps)}<div class="chips" style="justify-content:center">${ps.map(p=>`<button class="chip" onclick="tgS(${p.id})">✕ ${p.sub||CATS[p.cat]}</button>`).join("")}</div><div class="score">التقييم: <b>${sc}%</b></div><div class="bar"><i style="width:${sc}%"></i></div><div>${verdict(sc)}</div>${sample&&!sample.local?`<button class="btn alt" onclick="styAsk()">🧥 رأي المصمم</button>`:""}<div class="row2"><button class="btn alt" onclick="styFav()">${stEdit?"💾 حدّث الطقم":"♡ احفظ الطقم"}</button><button class="btn alt" onclick="sty=[];stEdit=null;render()">مسح</button></div><button class="btn alt" onclick="shareImg(sty,'طقمي')">📤 شارك الطقم</button><button class="btn" onclick="styWear()">ألبسه اليوم ✓</button></div>`}
  else h+=`<div class="card empty">اختر قطع من تحت وتظهر هنا 👇</div>`;
  if(!items.length)return h+`<div class="empty">خزانتك فاضية، أضف قطع أول</div>`;
  h+=`<h3>خزانتي</h3><div class="chips">${["all",...Object.keys(CATS)].map(c=>`<button class="chip ${stf==c?"on":""}" onclick="stf='${c}';render()">${c=="all"?"الكل":CATS[c]}</button>`).join("")}</div><div class="grid">${items.filter(i=>stf=="all"||i.cat==stf).map(i=>`<div class="piece ${sty.includes(i.id)?"sel":""}" onclick="tgS(${i.id})"><img src="${i.img}" alt="" loading="lazy" decoding="async"><span>${i.sub||CATS[i.cat]}${sty.includes(i.id)?" ✓":""}</span></div>`).join("")}</div>`;
@@ -495,7 +519,7 @@ function seasonNudge(){const n=items.filter(i=>i.cat!="acc"&&(i.season||"all")==
 async function autoSeason(){const l=items.filter(i=>(i.season||"all")=="all"&&!i.sd);if(!l.length)return toast("كل القطع محددة الموسم ✓");let ch=0;
  for(const it of l){const r=seasonRule(it.sub);if(r!="all"){it.season=r;it.sd=1;put("items",it);ch++}}
  const rest=l.filter(i=>(i.season||"all")=="all");let k=0;
- if(sample){for(const it of rest){toast(`جاري تحديد الموسم ${++k} / ${rest.length} ...`);const t=await aiTag(it.img);if(t&&t.season&&t.season!="all"){it.season=t.season;ch++}it.sd=1;put("items",it)}}
+ if(sample&&!sample.local){for(const it of rest){toast(`جاري تحديد الموسم ${++k} / ${rest.length} ...`);const t=await aiTag(it.img);if(t&&t.season&&t.season!="all"){it.season=t.season;ch++}it.sd=1;put("items",it)}}
  else rest.forEach(it=>{it.sd=1;put("items",it)});
  toast(ch?`تم تحديد الموسم لـ ${ch} قطعة ✓`:"القطع كلها تصلح لكل الأوقات");render()}
 async function autoTag(all){if(!sample)return toast("الميزة غير متاحة في هذه النسخة");const l=all?items:items.filter(i=>!i.sub);if(!l.length)return toast("كل القطع محددة ✓");let k=0,f=0;
