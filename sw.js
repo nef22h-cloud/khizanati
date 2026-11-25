@@ -1,6 +1,6 @@
 /* خزانتي — Service Worker: يخلّي التطبيق يفتح بدون إنترنت.
    غيّر رقم VERSION عند كل تحديث للملفات عشان تتحدّث النسخة المخزّنة. */
-const VERSION = "v2";
+const VERSION = "v3";
 const SHELL = `khizanati-shell-${VERSION}`;
 const RUNTIME = `khizanati-runtime-${VERSION}`;
 const SHELL_FILES = [
@@ -11,7 +11,8 @@ const SHELL_FILES = [
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/icon-maskable-512.png",
-  "./icons/apple-touch-icon.png"
+  "./icons/apple-touch-icon.png",
+  "./ai/labels.json"
 ];
 
 self.addEventListener("install", e => {
@@ -47,8 +48,9 @@ self.addEventListener("fetch", e => {
     return;
   }
 
-  // الخط (Google Fonts): من المخزّن مع تحديث بالخلفية
-  if (url.hostname === "fonts.googleapis.com" || url.hostname === "fonts.gstatic.com") {
+  // الخط (Google Fonts) ومكتبة الذكاء الاصطناعي (jsDelivr): من المخزّن مع تحديث بالخلفية
+  // (ملفات النموذج نفسها تخزّنها المكتبة بنفسها في transformers-cache)
+  if (url.hostname === "fonts.googleapis.com" || url.hostname === "fonts.gstatic.com" || url.hostname === "cdn.jsdelivr.net") {
     e.respondWith(
       caches.open(RUNTIME).then(c => c.match(req).then(hit => {
         const net = fetch(req).then(res => { if (res.ok || res.type === "opaque") c.put(req, res.clone()); return res; }).catch(() => hit);
