@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>خزانتي</title>
 <meta name="theme-color" content="#f3f4f7" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#0e0f12" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.json"><link rel="icon" href="icons/icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="خزانتي"><meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600&display=swap">
@@ -34,7 +35,6 @@ h3{margin:30px 0 10px;font-size:16px;font-weight:500}
 .ab{position:absolute;top:8px;left:8px;display:flex;gap:6px;z-index:2}.ab button{width:34px;height:34px;border:0;border-radius:50%;background:rgba(25,32,29,.55);font-size:15px;padding:0}
 #dlg{position:fixed;inset:0;background:rgba(20,28,25,.45);display:flex;align-items:flex-end;justify-content:center;z-index:50}#dlg[hidden],#toast[hidden]{display:none}
 .dbox{background:var(--card);padding:24px 20px calc(20px + env(safe-area-inset-bottom,0px));border-radius:26px 26px 0 0;width:100%;max-width:560px;max-height:90vh;overflow:auto;text-align:center;font-size:16px;font-weight:500;animation:up .22s ease-out}
-@keyframes up{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
 #toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:11px 18px;border-radius:99px;font-size:14px;z-index:60;max-width:90vw;text-align:center}
 .btn{border:0;border-radius:16px;min-height:50px;padding:12px 16px;font:inherit;font-size:16px;font-weight:500;background:var(--ac);color:var(--acx);width:100%;margin-top:10px}
 .btn.alt{background:var(--soft);color:var(--tx)}
@@ -597,6 +597,7 @@ document.addEventListener("click",e=>{if(fired){fired=0;e.stopPropagation();e.pr
 document.addEventListener("keydown",e=>{if(e.key=="Escape")close()})})();
 document.getElementById("dlg").onclick=e=>{if(e.target.id=="dlg")e.target.hidden=true};
 (async()=>{await openDB();dbDone=true;items=await all("items");items.filter(i=>i.demo).forEach(i=>del("items",i.id));items=items.filter(i=>!i.demo);items.forEach(i=>{if(i.orig){i.img=i.orig;delete i.orig;delete i.opts;put("items",i)}});outfits=(await all("outfits")).sort((a,b)=>b.id-a.id);(await all("log")).forEach(l=>log[l.d]=l.ids);events=await all("events");if(items.length){outfits=outfits.filter(f=>{if(f.ids.some($i))return true;del("outfits",f.id);return false});events=events.filter(e=>{if(e.ids.some($i))return true;del("events",e.id);return false})}render();try{if(localStorage.aw=="1"&&localStorage.awc){const c=localStorage.awc.split(",");getW(+c[0],+c[1],1)}}catch(e){}})();
+if("serviceWorker"in navigator&&location.protocol.startsWith("http"))addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 </script>
 </body>
 </html>
