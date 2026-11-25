@@ -1,0 +1,14 @@
+name = "khizanati-ai"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# المواقع المسموح لها تستخدم الوسيط (افصل بينها بفاصلة)
+ALLOWED_ORIGINS = "https://nef22h-cloud.github.io,http://localhost:8000"
+# النموذج المستخدم
+MODEL = "claude-opus-5-5"
+
+# الأسرار تنضاف بالأوامر (ما تنكتب هنا):
+#   npx wrangler secret put ANTHROPIC_API_KEY
+#   npx wrangler secret put APP_PASSCODE
