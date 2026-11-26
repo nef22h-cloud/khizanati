@@ -1,6 +1,6 @@
 /* خزانتي — Service Worker: يخلّي التطبيق يفتح بدون إنترنت.
    غيّر رقم VERSION عند كل تحديث للملفات عشان تتحدّث النسخة المخزّنة. */
-const VERSION = "v4";
+const VERSION = "v5";
 const SHELL = `khizanati-shell-${VERSION}`;
 const RUNTIME = `khizanati-runtime-${VERSION}`;
 const SHELL_FILES = [
@@ -22,7 +22,7 @@ self.addEventListener("install", e => {
 self.addEventListener("activate", e => {
   e.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== SHELL && k !== RUNTIME).map(k => caches.delete(k))))
+      .then(keys => Promise.all(keys.filter(k => k !== SHELL && k !== RUNTIME && k !== "khizanati-auto").map(k => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
